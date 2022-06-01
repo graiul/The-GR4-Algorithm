@@ -1,0 +1,2 @@
+https://www.jetbrains.com/help/pycharm/configuring-local-python-interpreters.html
+https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html#put-existing-project-under-Git
