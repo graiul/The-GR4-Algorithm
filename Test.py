@@ -1,6 +1,7 @@
 from numpy import pi
 from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.providers.ibmq import IBMQ
+from distributed import Client, LocalCluster, Worker, wait, progress
 
 def send_to_kingdom(quantum_backend_name, circuit_object):
     # IBMQ.save_account('e6bbad0f51ab787aec48bed242c422777f1680f0428e19b34e19bbcd467a2faff2bdcedd0cbb04b19f4bb700f66900728f778d4bc8226785e6c35dc818374ac8',
@@ -219,10 +220,18 @@ circuit_6_3.measure(qreg_q_6_3[4], creg_c_6_3[4])
     # print('other paramters (such as angles):', gate[0].params)
     # print(gate)
 
-nr_of_qubits = circuit_6_3.num_qubits
-print(nr_of_qubits)
+# nr_of_qubits = circuit_6_3.num_qubits
+# print(nr_of_qubits)
 
-send_to_kingdom('ibmq_lima', circuit_6_3)
+# send_to_kingdom('ibmq_lima', circuit_6_3)
+# https://github.com/dask/distributed/issues/2422
+if __name__ == '__main__':
+    lc = LocalCluster()
+    lc.scale(10)
+    client = Client(lc)
+    future1 = client.submit(send_to_kingdom, 'ibmq_lima', circuit_6_3)
+    wait(future1)
+    future1.result()
 
 # def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
 
