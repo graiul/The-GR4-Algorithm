@@ -122,94 +122,94 @@ circuit_6_3.measure(qreg_q_6_3[4], creg_c_6_3[4])
 
 # # Circuit Test 7.3, 15 Qubits
 #
-# qreg_q_7_3 = QuantumRegister(15, 'q')
-# creg_c_7_3 = ClassicalRegister(15, 'c')
-# circuit_7_3 = QuantumCircuit(qreg_q_7_3, creg_c_7_3)
-#
-# circuit_7_3.reset(qreg_q_7_3[0])
-# circuit_7_3.reset(qreg_q_7_3[1])
-# circuit_7_3.reset(qreg_q_7_3[2])
-# circuit_7_3.reset(qreg_q_7_3[3])
-# circuit_7_3.reset(qreg_q_7_3[4])
-# circuit_7_3.reset(qreg_q_7_3[5])
-# circuit_7_3.reset(qreg_q_7_3[6])
-# circuit_7_3.reset(qreg_q_7_3[7])
-# circuit_7_3.reset(qreg_q_7_3[8])
-# circuit_7_3.reset(qreg_q_7_3[9])
-# circuit_7_3.reset(qreg_q_7_3[10])
-# circuit_7_3.reset(qreg_q_7_3[11])
-# circuit_7_3.reset(qreg_q_7_3[12])
-# circuit_7_3.reset(qreg_q_7_3[13])
-# circuit_7_3.reset(qreg_q_7_3[14])
-# circuit_7_3.h(qreg_q_7_3[0])
-# circuit_7_3.h(qreg_q_7_3[1])
-# circuit_7_3.h(qreg_q_7_3[2])
-# circuit_7_3.h(qreg_q_7_3[3])
-# circuit_7_3.h(qreg_q_7_3[4])
-# circuit_7_3.h(qreg_q_7_3[5])
-# circuit_7_3.h(qreg_q_7_3[6])
-# circuit_7_3.h(qreg_q_7_3[7])
-# circuit_7_3.h(qreg_q_7_3[8])
-# circuit_7_3.h(qreg_q_7_3[9])
-# circuit_7_3.h(qreg_q_7_3[10])
-# circuit_7_3.h(qreg_q_7_3[11])
-# circuit_7_3.h(qreg_q_7_3[12])
-# circuit_7_3.h(qreg_q_7_3[13])
-# circuit_7_3.h(qreg_q_7_3[14])
-# circuit_7_3.rx(pi / 2, qreg_q_7_3[0])
-# circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[1])
-# circuit_7_3.p(pi / 2, qreg_q_7_3[2])
-# circuit_7_3.z(qreg_q_7_3[3])
-# circuit_7_3.y(qreg_q_7_3[4])
-# circuit_7_3.t(qreg_q_7_3[5])
-# circuit_7_3.p(pi / 2, qreg_q_7_3[6])
-# circuit_7_3.y(qreg_q_7_3[7])
-# circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[8])
-# circuit_7_3.z(qreg_q_7_3[9])
-# circuit_7_3.sx(qreg_q_7_3[10])
-# circuit_7_3.z(qreg_q_7_3[11])
-# circuit_7_3.p(pi / 2, qreg_q_7_3[12])
-# circuit_7_3.ry(pi / 2, qreg_q_7_3[13])
-# circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[14])
-# circuit_7_3.s(qreg_q_7_3[0])
-# circuit_7_3.h(qreg_q_7_3[1])
-# circuit_7_3.h(qreg_q_7_3[2])
-# circuit_7_3.h(qreg_q_7_3[3])
-# circuit_7_3.h(qreg_q_7_3[4])
-# circuit_7_3.h(qreg_q_7_3[5])
-# circuit_7_3.h(qreg_q_7_3[6])
-# circuit_7_3.h(qreg_q_7_3[7])
-# circuit_7_3.h(qreg_q_7_3[8])
-# circuit_7_3.h(qreg_q_7_3[9])
-# circuit_7_3.h(qreg_q_7_3[10])
-# circuit_7_3.h(qreg_q_7_3[11])
-# circuit_7_3.h(qreg_q_7_3[12])
-# circuit_7_3.h(qreg_q_7_3[13])
-# circuit_7_3.h(qreg_q_7_3[14])
-# circuit_7_3.h(qreg_q_7_3[0])
-# circuit_7_3.tdg(qreg_q_7_3[3])
-# circuit_7_3.sdg(qreg_q_7_3[4])
-# circuit_7_3.rz(pi / 2, qreg_q_7_3[5])
-# circuit_7_3.sx(qreg_q_7_3[6])
-# circuit_7_3.sx(qreg_q_7_3[13])
-# circuit_7_3.y(qreg_q_7_3[14])
-# circuit_7_3.h(qreg_q_7_3[5])
-# circuit_7_3.h(qreg_q_7_3[13])
-# circuit_7_3.measure(qreg_q_7_3[0], creg_c_7_3[0])
-# circuit_7_3.measure(qreg_q_7_3[1], creg_c_7_3[1])
-# circuit_7_3.measure(qreg_q_7_3[2], creg_c_7_3[2])
-# circuit_7_3.measure(qreg_q_7_3[3], creg_c_7_3[3])
-# circuit_7_3.measure(qreg_q_7_3[4], creg_c_7_3[4])
-# circuit_7_3.measure(qreg_q_7_3[5], creg_c_7_3[5])
-# circuit_7_3.measure(qreg_q_7_3[6], creg_c_7_3[6])
-# circuit_7_3.measure(qreg_q_7_3[7], creg_c_7_3[7])
-# circuit_7_3.measure(qreg_q_7_3[8], creg_c_7_3[8])
-# circuit_7_3.measure(qreg_q_7_3[9], creg_c_7_3[9])
-# circuit_7_3.measure(qreg_q_7_3[10], creg_c_7_3[10])
-# circuit_7_3.measure(qreg_q_7_3[11], creg_c_7_3[11])
-# circuit_7_3.measure(qreg_q_7_3[12], creg_c_7_3[12])
-# circuit_7_3.measure(qreg_q_7_3[13], creg_c_7_3[13])
-# circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
+qreg_q_7_3 = QuantumRegister(15, 'q')
+creg_c_7_3 = ClassicalRegister(15, 'c')
+circuit_7_3 = QuantumCircuit(qreg_q_7_3, creg_c_7_3)
+
+circuit_7_3.reset(qreg_q_7_3[0])
+circuit_7_3.reset(qreg_q_7_3[1])
+circuit_7_3.reset(qreg_q_7_3[2])
+circuit_7_3.reset(qreg_q_7_3[3])
+circuit_7_3.reset(qreg_q_7_3[4])
+circuit_7_3.reset(qreg_q_7_3[5])
+circuit_7_3.reset(qreg_q_7_3[6])
+circuit_7_3.reset(qreg_q_7_3[7])
+circuit_7_3.reset(qreg_q_7_3[8])
+circuit_7_3.reset(qreg_q_7_3[9])
+circuit_7_3.reset(qreg_q_7_3[10])
+circuit_7_3.reset(qreg_q_7_3[11])
+circuit_7_3.reset(qreg_q_7_3[12])
+circuit_7_3.reset(qreg_q_7_3[13])
+circuit_7_3.reset(qreg_q_7_3[14])
+circuit_7_3.h(qreg_q_7_3[0])
+circuit_7_3.h(qreg_q_7_3[1])
+circuit_7_3.h(qreg_q_7_3[2])
+circuit_7_3.h(qreg_q_7_3[3])
+circuit_7_3.h(qreg_q_7_3[4])
+circuit_7_3.h(qreg_q_7_3[5])
+circuit_7_3.h(qreg_q_7_3[6])
+circuit_7_3.h(qreg_q_7_3[7])
+circuit_7_3.h(qreg_q_7_3[8])
+circuit_7_3.h(qreg_q_7_3[9])
+circuit_7_3.h(qreg_q_7_3[10])
+circuit_7_3.h(qreg_q_7_3[11])
+circuit_7_3.h(qreg_q_7_3[12])
+circuit_7_3.h(qreg_q_7_3[13])
+circuit_7_3.h(qreg_q_7_3[14])
+circuit_7_3.rx(pi / 2, qreg_q_7_3[0])
+circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[1])
+circuit_7_3.p(pi / 2, qreg_q_7_3[2])
+circuit_7_3.z(qreg_q_7_3[3])
+circuit_7_3.y(qreg_q_7_3[4])
+circuit_7_3.t(qreg_q_7_3[5])
+circuit_7_3.p(pi / 2, qreg_q_7_3[6])
+circuit_7_3.y(qreg_q_7_3[7])
+circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[8])
+circuit_7_3.z(qreg_q_7_3[9])
+circuit_7_3.sx(qreg_q_7_3[10])
+circuit_7_3.z(qreg_q_7_3[11])
+circuit_7_3.p(pi / 2, qreg_q_7_3[12])
+circuit_7_3.ry(pi / 2, qreg_q_7_3[13])
+circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[14])
+circuit_7_3.s(qreg_q_7_3[0])
+circuit_7_3.h(qreg_q_7_3[1])
+circuit_7_3.h(qreg_q_7_3[2])
+circuit_7_3.h(qreg_q_7_3[3])
+circuit_7_3.h(qreg_q_7_3[4])
+circuit_7_3.h(qreg_q_7_3[5])
+circuit_7_3.h(qreg_q_7_3[6])
+circuit_7_3.h(qreg_q_7_3[7])
+circuit_7_3.h(qreg_q_7_3[8])
+circuit_7_3.h(qreg_q_7_3[9])
+circuit_7_3.h(qreg_q_7_3[10])
+circuit_7_3.h(qreg_q_7_3[11])
+circuit_7_3.h(qreg_q_7_3[12])
+circuit_7_3.h(qreg_q_7_3[13])
+circuit_7_3.h(qreg_q_7_3[14])
+circuit_7_3.h(qreg_q_7_3[0])
+circuit_7_3.tdg(qreg_q_7_3[3])
+circuit_7_3.sdg(qreg_q_7_3[4])
+circuit_7_3.rz(pi / 2, qreg_q_7_3[5])
+circuit_7_3.sx(qreg_q_7_3[6])
+circuit_7_3.sx(qreg_q_7_3[13])
+circuit_7_3.y(qreg_q_7_3[14])
+circuit_7_3.h(qreg_q_7_3[5])
+circuit_7_3.h(qreg_q_7_3[13])
+circuit_7_3.measure(qreg_q_7_3[0], creg_c_7_3[0])
+circuit_7_3.measure(qreg_q_7_3[1], creg_c_7_3[1])
+circuit_7_3.measure(qreg_q_7_3[2], creg_c_7_3[2])
+circuit_7_3.measure(qreg_q_7_3[3], creg_c_7_3[3])
+circuit_7_3.measure(qreg_q_7_3[4], creg_c_7_3[4])
+circuit_7_3.measure(qreg_q_7_3[5], creg_c_7_3[5])
+circuit_7_3.measure(qreg_q_7_3[6], creg_c_7_3[6])
+circuit_7_3.measure(qreg_q_7_3[7], creg_c_7_3[7])
+circuit_7_3.measure(qreg_q_7_3[8], creg_c_7_3[8])
+circuit_7_3.measure(qreg_q_7_3[9], creg_c_7_3[9])
+circuit_7_3.measure(qreg_q_7_3[10], creg_c_7_3[10])
+circuit_7_3.measure(qreg_q_7_3[11], creg_c_7_3[11])
+circuit_7_3.measure(qreg_q_7_3[12], creg_c_7_3[12])
+circuit_7_3.measure(qreg_q_7_3[13], creg_c_7_3[13])
+circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
 
 # https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
@@ -224,16 +224,98 @@ circuit_6_3.measure(qreg_q_6_3[4], creg_c_6_3[4])
 # print(nr_of_qubits)
 
 # send_to_kingdom('ibmq_lima', circuit_6_3)
+
+# https://www.geeksforgeeks.org/number-of-ways-to-split-n-as-sum-of-k-numbers-from-the-given-range/
+# Python3 implementation to count the
+# number of ways to divide N in K
+# groups such that each group
+# has elements in range [L, R]
+mod = 1000000007
+
+# DP Table
+dp = [[-1 for j in range(1000)]
+      for i in range(1000)]
+
+# Function to count the number
+# of ways to divide the number N
+# in K groups such that each group
+# has number of elements in range [L, R]
+def calculate(pos, left, k, L, R):
+
+    # Base Case
+    if (pos == k):
+        if (left == 0):
+            return 1
+        else:
+            return 0
+
+    # if N is divides completely
+    # into less than k groups
+    if (left == 0):
+        return 0
+
+    # If the subproblem has been
+    # solved, use the value
+    if (dp[pos][left] != -1):
+        return dp[pos][left]
+
+    answer = 0
+
+    # put all possible values
+    # greater equal to prev
+    for i in range(L, R + 1):
+        if (i > left):
+            break
+
+        answer = (answer +
+                  calculate(pos + 1,
+                            left - i,
+                            k, L, R)) % mod
+
+    dp[pos][left] = answer
+
+    return answer
+
+# Function to count the number of
+# ways to divide the number N
+def countWaystoDivide(n, k, L, R):
+
+    return calculate(0, n, k, L, R)
+
+# Driver code
+# if __name__ == "__main__":
+#     N = 12
+#     K = 3
+#     L = 1
+#     R = 5
+#
+#     print(countWaystoDivide(N, K, L, R))
+
+# This code is contributed by rutvik_56
+
+def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
+    nr_of_qubits = circuit.num_qubits
+    print("Number of qubits: " + str(nr_of_qubits))
+
+    print("Qubits: ")
+    print(circuit.qubits)
+    # print(circuit.draw())
+    # print(countWaystoDivide(nr_of_qubits, 3, 1, 10))
+    while nr_of_qubits > 0:
+        nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part
+        print(nr_of_qubits)
+
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
-    lc = LocalCluster()
-    lc.scale(10)
-    client = Client(lc)
-    future1 = client.submit(send_to_kingdom, 'ibmq_lima', circuit_6_3)
-    wait(future1)
-    future1.result()
+    # lc = LocalCluster()
+    # lc.scale(10)
+    # client = Client(lc)
+    # future1 = client.submit(send_to_kingdom, 'ibmq_lima', circuit_6_3)
+    # wait(future1)
+    # future1.result()
+    quantum_circuit_splitter(circuit_7_3, 5)
 
-# def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
+
 
 
 
