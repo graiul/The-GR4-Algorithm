@@ -230,57 +230,57 @@ circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 # number of ways to divide N in K
 # groups such that each group
 # has elements in range [L, R]
-mod = 1000000007
-
-# DP Table
-dp = [[-1 for j in range(1000)]
-      for i in range(1000)]
-
-# Function to count the number
-# of ways to divide the number N
-# in K groups such that each group
-# has number of elements in range [L, R]
-def calculate(pos, left, k, L, R):
-
-    # Base Case
-    if (pos == k):
-        if (left == 0):
-            return 1
-        else:
-            return 0
-
-    # if N is divides completely
-    # into less than k groups
-    if (left == 0):
-        return 0
-
-    # If the subproblem has been
-    # solved, use the value
-    if (dp[pos][left] != -1):
-        return dp[pos][left]
-
-    answer = 0
-
-    # put all possible values
-    # greater equal to prev
-    for i in range(L, R + 1):
-        if (i > left):
-            break
-
-        answer = (answer +
-                  calculate(pos + 1,
-                            left - i,
-                            k, L, R)) % mod
-
-    dp[pos][left] = answer
-
-    return answer
-
-# Function to count the number of
-# ways to divide the number N
-def countWaystoDivide(n, k, L, R):
-
-    return calculate(0, n, k, L, R)
+# mod = 1000000007
+#
+# # DP Table
+# dp = [[-1 for j in range(1000)]
+#       for i in range(1000)]
+#
+# # Function to count the number
+# # of ways to divide the number N
+# # in K groups such that each group
+# # has number of elements in range [L, R]
+# def calculate(pos, left, k, L, R):
+#
+#     # Base Case
+#     if (pos == k):
+#         if (left == 0):
+#             return 1
+#         else:
+#             return 0
+#
+#     # if N is divides completely
+#     # into less than k groups
+#     if (left == 0):
+#         return 0
+#
+#     # If the subproblem has been
+#     # solved, use the value
+#     if (dp[pos][left] != -1):
+#         return dp[pos][left]
+#
+#     answer = 0
+#
+#     # put all possible values
+#     # greater equal to prev
+#     for i in range(L, R + 1):
+#         if (i > left):
+#             break
+#
+#         answer = (answer +
+#                   calculate(pos + 1,
+#                             left - i,
+#                             k, L, R)) % mod
+#
+#     dp[pos][left] = answer
+#
+#     return answer
+#
+# # Function to count the number of
+# # ways to divide the number N
+# def countWaystoDivide(n, k, L, R):
+#
+#     return calculate(0, n, k, L, R)
 
 # Driver code
 # if __name__ == "__main__":
@@ -299,11 +299,23 @@ def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
 
     print("Qubits: ")
     print(circuit.qubits)
-    # print(circuit.draw())
+    print(circuit.draw())
     # print(countWaystoDivide(nr_of_qubits, 3, 1, 10))
     while nr_of_qubits > 0:
         nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part
         print(nr_of_qubits)
+        quantum_circuit_creator(circuit, nr_of_qubits)
+        break
+
+
+def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
+    print("Quantum circuit creator")
+#     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
+    for gate in original_circuit.data:
+        print('\ngate name:', gate[0].name)
+        print('qubit(s) acted on:', gate[1])
+        print('other paramters (such as angles):', gate[0].params)
+
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
