@@ -315,7 +315,15 @@ def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
         print('\ngate name:', gate[0].name)
         print('qubit(s) acted on:', gate[1])
         print('other paramters (such as angles):', gate[0].params)
-
+    # for nr in range(len(original_circuit.data)-1):
+    L = 0
+    R = number_of_qubits_to_be_taken
+    print("\nL = " + str(L))
+    print("\nR = " + str(R))
+    print("\nQubits for the new circuit: ")
+    for nr in range(L, R):
+        print(original_circuit.data[nr])
+#     print(original_circuit.data)
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
