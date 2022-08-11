@@ -319,10 +319,13 @@ def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
     L = 0
     R = number_of_qubits_to_be_taken
     print("\nL = " + str(L))
-    print("\nR = " + str(R))
+    print("R = " + str(R))
     print("\nQubits for the new circuit: ")
     for nr in range(L, R):
         print(original_circuit.data[nr])
+    L = R + 1
+    R =
+
 #     print(original_circuit.data)
 
 # https://github.com/dask/distributed/issues/2422
