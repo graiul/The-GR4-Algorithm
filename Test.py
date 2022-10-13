@@ -326,7 +326,9 @@ def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
 #     print("-------------------------------")
 
 def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
-    nr_of_qubits = circuit.num_qubits
+    # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
+    nr_of_qubits = circuit.num_qubits # Acesta va fi numarul de qubiti disponibili aflat automat pentru fiecare calculator/simulator cuantic
+
     print("Number of qubits: " + str(nr_of_qubits))
     print("Number of qubits per part: " + str(nr_of_qubits_per_part))
     # print("Qubits: ")
