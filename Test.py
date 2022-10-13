@@ -293,40 +293,78 @@ circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
 # This code is contributed by rutvik_56
 
+def print_circuit_range(circuit, L, R):
+    print("\nL = " + str(L))
+    print("R = " + str(R))
+    for nr in range(L, R):
+        # print(circuit.data[nr])
+        #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
+        for gate in circuit.data:
+            qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
+            if qubit_acted_on == nr:
+                print('\ngate name:', gate[0].name)
+                print('qubit(s) acted on:')
+                print(qubit_acted_on)
+
+def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
+    # print("-------------------------------")
+    print("\nQuantum circuit creator")
+    print("-------------------------------")
+#     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
+#     for gate in original_circuit.data:
+#         print('\ngate name:', gate[0].name)
+#         print('qubit(s) acted on:', gate[1])
+#         print('other paramters (such as angles):', gate[0].params)
+    # for nr in range(len(original_circuit.data)-1):
+    # L = 0
+    # R = number_of_qubits_to_be_taken
+    # print("\nQubits for the new circuit: ")
+
+    # print_circuit_range(original_circuit, L, R)
+
+#     print(original_circuit.data)
+#     print("-------------------------------")
+
 def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
     nr_of_qubits = circuit.num_qubits
     print("Number of qubits: " + str(nr_of_qubits))
-
-    print("Qubits: ")
-    print(circuit.qubits)
+    print("Number of qubits per part: " + str(nr_of_qubits_per_part))
+    # print("Qubits: ")
+    # print(circuit.qubits)
+    print("Quantum circuit figure: ")
     print(circuit.draw())
+    # exit(0)
     # print(countWaystoDivide(nr_of_qubits, 3, 1, 10))
-    while nr_of_qubits > 0:
-        nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part
-        print(nr_of_qubits)
-        quantum_circuit_creator(circuit, nr_of_qubits)
-        break
 
-
-def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
-    print("Quantum circuit creator")
-#     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
-    for gate in original_circuit.data:
-        print('\ngate name:', gate[0].name)
-        print('qubit(s) acted on:', gate[1])
-        print('other paramters (such as angles):', gate[0].params)
-    # for nr in range(len(original_circuit.data)-1):
     L = 0
-    R = number_of_qubits_to_be_taken
-    print("\nL = " + str(L))
-    print("R = " + str(R))
+    R = nr_of_qubits_per_part
     print("\nQubits for the new circuit: ")
-    for nr in range(L, R):
-        print(original_circuit.data[nr])
-    L = R + 1
-    R =
+    print_circuit_range(circuit, L, R)
 
-#     print(original_circuit.data)
+    while nr_of_qubits >= 0:
+        if nr_of_qubits > 0:
+            quantum_circuit_creator(circuit, nr_of_qubits_per_part)
+            print_circuit_range(circuit, L, R)
+
+            nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part # Numarul de qubiti ramasi din circuitul initial
+            print("\nNumber of qubits left: " + str(nr_of_qubits))
+
+            L = R + 1
+            R = R + nr_of_qubits_per_part +1
+            print("\nQubits for the new circuit: ")
+            print_circuit_range(circuit, L, R)
+
+        if nr_of_qubits == 0:
+            # for gate in circuit.data:
+            #     print('\ngate name:', gate[0].name)
+            #     qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
+            #     print('qubit(s) acted on:')
+            #     print(qubit_acted_on)
+                # print('qubit(s) acted on:', str(gate[1]).split("'),")[1].split(")]")[0])
+                # print('other paramters (such as angles):', gate[0].params)
+            break
+
+
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
