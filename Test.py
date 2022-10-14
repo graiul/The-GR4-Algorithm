@@ -293,6 +293,7 @@ circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
 # This code is contributed by rutvik_56
 
+# Aceasta e prima metoda care trebuie apelata in programul principal ca si operatie asupra unui circuit creat.
 # Fiecare linie a matricii reprezinta un qubit, iar elementele unei linii reprezinta portile de pe qubitul respectiv.
 def convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit):
     print("\nL = " + str(L))
@@ -302,10 +303,16 @@ def convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit):
         #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
         qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
         gate_name = gate[0].name
-        print('\ngate name:', gate_name)
-        print('qubit(s) acted on:')
-        print(qubit_acted_on)
-        gates_for_each_qubit[qubit_acted_on][j] = gate_name
+        # print('\ngate name:', gate_name)
+        # print('qubit(s) acted on:')
+        # print(qubit_acted_on)
+        # Pentru a evita suprascrierea unei valori, astfel evitand disparitia unei porti,
+        # se verifica daca exista un element deja pe pozitia selectata.
+        if gates_for_each_qubit[qubit_acted_on][j] == "":
+            gates_for_each_qubit[qubit_acted_on][j] = gate_name
+        else:
+            # Daca exista deja un element pe pozitia selectata, noua poarta/operatie este plasata pe pozitia urmatoare.
+            gates_for_each_qubit[qubit_acted_on][j+1] = gate_name
         if qubit_acted_on == 14: # Nr de qubiti ai circuitului -1, daca am ajuns la ultimul qubit, pt ca numerotarea incepe de la 0.
             j = j+1
 
@@ -355,7 +362,9 @@ def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
     print("\nQubits for the new circuit: ")
     # https://www.geeksforgeeks.org/python-list-comprehension/
     # https://stackoverflow.com/questions/6376886/what-is-the-best-way-to-create-a-string-array-in-python
-    gates_for_each_qubit = [["" for j in range(15)] for i in range(15)] # In loc de 15 se va pune automat nr de qubiti
+    # In loc de 15 se va pune automat nr de qubiti pentru numarul de linii.
+    # Numarul de coloane poate fi mai mare, in functie de nr maxim de porti pe care vrea utilizatorul sa plaseze pe cate un qubit.
+    gates_for_each_qubit = [["" for j in range(15)] for i in range(15)]
     convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
 
     while nr_of_qubits >= 0:
