@@ -1,3 +1,5 @@
+import copy
+
 from numpy import pi
 from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.providers.ibmq import IBMQ
@@ -295,9 +297,12 @@ circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
 # Aceasta e prima metoda care trebuie apelata in programul principal ca si operatie asupra unui circuit creat.
 # Fiecare linie a matricii reprezinta un qubit, iar elementele unei linii reprezinta portile de pe qubitul respectiv.
-def convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit):
-    print("\nL = " + str(L))
-    print("R = " + str(R))
+def convert_circuit_to_matrix(circuit, circuit_number_of_qubits):
+    # https://www.geeksforgeeks.org/python-list-comprehension/
+    # https://stackoverflow.com/questions/6376886/what-is-the-best-way-to-create-a-string-array-in-python
+    # In loc de 15 se va pune automat nr de qubiti pentru numarul de linii.
+    # Numarul de coloane poate fi mai mare, in functie de nr maxim de porti pe care vrea utilizatorul sa plaseze pe cate un qubit.
+    gates_for_each_qubit = [["" for j in range(50)] for i in range(circuit_number_of_qubits)]
     j = 0
     for gate in circuit.data:
         #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
@@ -315,57 +320,38 @@ def convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit):
             gates_for_each_qubit[qubit_acted_on][j+1] = gate_name
         if qubit_acted_on == 14: # Nr de qubiti ai circuitului -1, daca am ajuns la ultimul qubit, pt ca numerotarea incepe de la 0.
             j = j+1
+    return gates_for_each_qubit
 
-    print("Final gate list: ")
+def print_circuit_matrix_and_figure(circuit_matrix, circuit):
+    print("\nQuantum circuit figure: ")
+    print(circuit.draw())
+    print("\nFinal gate list: ")
     i = 0
-    for item in gates_for_each_qubit:
+    for item in circuit_matrix:
         print("Qubit", i, item)
         i = i + 1
         # print(item)
         # print()
-    exit(0)
+    # exit(0)
 
-# def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
-    # print("-------------------------------")
-    # print("\nQuantum circuit creator")
-    # print("-------------------------------")
-#     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
-#     for gate in original_circuit.data:
-#         print('\ngate name:', gate[0].name)
-#         print('qubit(s) acted on:', gate[1])
-#         print('other paramters (such as angles):', gate[0].params)
-    # for nr in range(len(original_circuit.data)-1):
-    # L = 0
-    # R = number_of_qubits_to_be_taken
-    # print("\nQubits for the new circuit: ")
-
-    # print_circuit_range(original_circuit, L, R)
-
-#     print(original_circuit.data)
-#     print("-------------------------------")
-
-def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
+# Aceasta metoda lucreaza cu matricea care a fost creata din circuitul cuantic.
+# Matricea va fi segmentata in parti. Fiecare parte va avea un numarul de qubiti.
+# Acest numar este numarul de qubiti de care dispune calculatorul/simulatorul cuantic selectat.
+# Acest numar poate fi obtinut printr-o comanda qiskit:
     # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
-    nr_of_qubits = circuit.num_qubits # Acesta va fi numarul de qubiti disponibili aflat automat pentru fiecare calculator/simulator cuantic
-
-    print("Number of qubits: " + str(nr_of_qubits))
-    print("Number of qubits per part: " + str(nr_of_qubits_per_part))
+def quantum_circuit_matrix_part_getter(circuit_matrix, nr_of_qubits_per_part):
+    # print("Number of qubits: " + str(nr_of_qubits))
+    # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
     # print("Qubits: ")
     # print(circuit.qubits)
-    print("Quantum circuit figure: ")
-    print(circuit.draw())
+
     # exit(0)
     # print(countWaystoDivide(nr_of_qubits, 3, 1, 10))
 
     L = 0
     R = nr_of_qubits_per_part
     print("\nQubits for the new circuit: ")
-    # https://www.geeksforgeeks.org/python-list-comprehension/
-    # https://stackoverflow.com/questions/6376886/what-is-the-best-way-to-create-a-string-array-in-python
-    # In loc de 15 se va pune automat nr de qubiti pentru numarul de linii.
-    # Numarul de coloane poate fi mai mare, in functie de nr maxim de porti pe care vrea utilizatorul sa plaseze pe cate un qubit.
-    gates_for_each_qubit = [["" for j in range(15)] for i in range(15)]
-    convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
+
 
     while nr_of_qubits >= 0:
         if nr_of_qubits > 0:
@@ -395,17 +381,68 @@ def quantum_circuit_splitter(circuit, nr_of_qubits_per_part):
             # print(circuit.draw())
             break
 
+# def quantum_circuit_creator(original_circuit, number_of_qubits_to_be_taken):
+    # print("-------------------------------")
+    # print("\nQuantum circuit creator")
+    # print("-------------------------------")
+#     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
+#     for gate in original_circuit.data:
+#         print('\ngate name:', gate[0].name)
+#         print('qubit(s) acted on:', gate[1])
+#         print('other paramters (such as angles):', gate[0].params)
+    # for nr in range(len(original_circuit.data)-1):
+    # L = 0
+    # R = number_of_qubits_to_be_taken
+    # print("\nQubits for the new circuit: ")
 
+    # print_circuit_range(original_circuit, L, R)
+
+#     print(original_circuit.data)
+#     print("-------------------------------")
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
+    # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
+    from qiskit.test.mock import FakeProvider
+    provider = FakeProvider()
+    backends = provider.backends()
+    backend_1 = provider.get_backend('fake_belem')
+    backend_2 = provider.get_backend('fake_lima')
+    backend_3 = provider.get_backend('fake_quito')
+    backend_name_1 = backend_1.name()
+    backend_name_2 = backend_2.name()
+    backend_name_3 = backend_3.name()
+    backend_1_number_of_qubits = backend_1.configuration().n_qubits
+    backend_2_number_of_qubits = backend_2.configuration().n_qubits
+    backend_3_number_of_qubits = backend_3.configuration().n_qubits
+
+    print(backends)
+    print("Backend name:", backend_name_1, ". It has a capacity of", backend_1_number_of_qubits, "qubits.")
+    print("Backend name:", backend_name_2, ". It has a capacity of", backend_2_number_of_qubits, "qubits.")
+    print("Backend name:", backend_name_3, ". It has a capacity of", backend_3_number_of_qubits, "qubits.")
+
+    # exit(0)
+
+    nr_of_qubits = circuit_7_3.num_qubits
+    circuit_converted_to_matrix = copy.deepcopy(convert_circuit_to_matrix(circuit_7_3, nr_of_qubits))
+    print_circuit_matrix_and_figure(circuit_converted_to_matrix, circuit_7_3)
+    # exit(0)
+
+    # Primul parametru este matricea aferenta circuitului.
+    # Al doilea parametru este numarul de qubiti de care dispune fiecare echipament.
+    # Va fi extras din matrice un numar de qubiti egal cu cel de mai sus.
+    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
+    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
+    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
+
+
     # lc = LocalCluster()
     # lc.scale(10)
     # client = Client(lc)
     # future1 = client.submit(send_to_kingdom, 'ibmq_lima', circuit_6_3)
     # wait(future1)
     # future1.result()
-    quantum_circuit_splitter(circuit_7_3, 5)
+    # quantum_circuit_splitter(circuit_7_3, 5)
 
 
 
