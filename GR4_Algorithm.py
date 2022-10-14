@@ -219,53 +219,62 @@ class GR4_Algorithm(object):
         # exit(0)
 
     # Aceasta metoda lucreaza cu matricea care a fost creata din circuitul cuantic.
+    # Ea sterge partea extrasa din matricea originala a circuitului.
+    # Astfel, qubitii care trebuie extrasi se afla intotdeauna la inceputul listei.
+    # Acest lucru simplifica extragerea, efectuandu-se operatiunea de slice a listei folosind nr de qubiti disponibili ai echipamentului cuantic.
     # Matricea va fi segmentata in parti. Fiecare parte va avea un numarul de qubiti.
     # Acest numar este numarul de qubiti de care dispune calculatorul/simulatorul cuantic selectat.
     # Acest numar poate fi obtinut printr-o comanda qiskit:
-        # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
-    def quantum_circuit_matrix_part_getter(self, circuit_matrix, nr_of_qubits_per_part):
+    # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
+
+    def quantum_circuit_matrix_part_getter(self, nr_of_qubits_per_part):
+        # https://www.geeksforgeeks.org/python-list-slicing/
+        part = self.circuit_matrix[0:nr_of_qubits_per_part]
+        # https://stackoverflow.com/questions/497426/deleting-multiple-elements-from-a-list
+        del self.circuit_matrix[0:nr_of_qubits_per_part]
+        print()
+        for item in part:
+            print(item)
+        self.print_circuit_matrix_and_figure()
+        return part
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
         # print("Qubits: ")
         # print(circuit.qubits)
+        #
+        # L = 0
+        # R = nr_of_qubits_per_part
+        # print("\nQubits for the new circuit: ")
+        #
+        # while nr_of_qubits >= 0:
+        #     if nr_of_qubits > 0:
+        #         # quantum_circuit_creator(circuit, nr_of_qubits_per_part)
+        #         convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
+        #
+        #         nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part # Numarul de qubiti ramasi din circuitul initial
+        #         print("\nNumber of qubits left: " + str(nr_of_qubits))
+        #
+        #         L = R + 1
+        #         R = R + nr_of_qubits_per_part +1
+        #         print("\nQubits for the new circuit: ")
+        #         convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
+        #
+        #     if nr_of_qubits == 0:
+        #         # for gate in circuit.data:
+        #         #     print('\ngate name:', gate[0].name)
+        #         #     qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
+        #         #     print('qubit(s) acted on:')
+        #         #     print(qubit_acted_on)
+        #             # print('qubit(s) acted on:', str(gate[1]).split("'),")[1].split(")]")[0])
+        #             # print('other paramters (such as angles):', gate[0].params)
+        #         # print("Final gate list: ")
+        #         # for item in gates_for_each_qubit:
+        #         #     print(item)
+        #         #     print()
+        #         # print(circuit.draw())
+        #         break
 
-        # exit(0)
-        # print(countWaystoDivide(nr_of_qubits, 3, 1, 10))
-
-        L = 0
-        R = nr_of_qubits_per_part
-        print("\nQubits for the new circuit: ")
-
-
-        while nr_of_qubits >= 0:
-            if nr_of_qubits > 0:
-                # quantum_circuit_creator(circuit, nr_of_qubits_per_part)
-                convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
-
-                nr_of_qubits = nr_of_qubits-nr_of_qubits_per_part # Numarul de qubiti ramasi din circuitul initial
-                print("\nNumber of qubits left: " + str(nr_of_qubits))
-
-                L = R + 1
-                R = R + nr_of_qubits_per_part +1
-                print("\nQubits for the new circuit: ")
-                convert_circuit_to_matrix(circuit, L, R, gates_for_each_qubit)
-
-            if nr_of_qubits == 0:
-                # for gate in circuit.data:
-                #     print('\ngate name:', gate[0].name)
-                #     qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
-                #     print('qubit(s) acted on:')
-                #     print(qubit_acted_on)
-                    # print('qubit(s) acted on:', str(gate[1]).split("'),")[1].split(")]")[0])
-                    # print('other paramters (such as angles):', gate[0].params)
-                # print("Final gate list: ")
-                # for item in gates_for_each_qubit:
-                #     print(item)
-                #     print()
-                # print(circuit.draw())
-                break
-
-    # def quantum_circuit_creator(self, original_circuit, number_of_qubits_to_be_taken):
+    def quantum_circuit_creator(self, original_circuit, number_of_qubits_to_be_taken):
     #     print("-------------------------------")
     #     print("\nQuantum circuit creator")
     #     print("-------------------------------")
@@ -404,14 +413,14 @@ if __name__ == '__main__':
     nr_of_qubits = circuit_7_3.num_qubits
     circuit_converted_to_matrix = copy.deepcopy(gr4.convert_circuit_to_matrix(nr_of_qubits))
     gr4.print_circuit_matrix_and_figure()
-    exit(0)
+    # exit(0)
 
     # Primul parametru este matricea aferenta circuitului.
     # Al doilea parametru este numarul de qubiti de care dispune fiecare echipament.
     # Va fi extras din matrice un numar de qubiti egal cu cel de mai sus.
-    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
-    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
-    quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_1_number_of_qubits)
+    gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits)
+    # quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_2_number_of_qubits)
+    # quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_3_number_of_qubits)
 
 
     # lc = LocalCluster()
