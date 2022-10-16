@@ -275,6 +275,8 @@ class GR4_Algorithm(object):
         #         break
 
     def quantum_circuit_creator(self, circuit_part):
+        from numpy import pi # Am pus acest import aici pentru ca altfel Dask da eroare ca nu a fost definit 'pi'.
+
     #     print("-------------------------------")
     #     print("\nQuantum circuit creator")
         number_of_qubits_for_the_new_circuit = len(circuit_part)
@@ -461,27 +463,30 @@ if __name__ == '__main__':
     # Primul parametru este matricea aferenta circuitului.
     # Al doilea parametru este numarul de qubiti de care dispune fiecare echipament.
     # Va fi extras din matrice un numar de qubiti egal cu cel de mai sus.
-    circuit_part_1 = gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits)
-    new_circuit_1 = gr4.quantum_circuit_creator(circuit_part_1)
-    print(new_circuit_1.draw())
-    circuit_part_2 = gr4.quantum_circuit_matrix_part_getter(backend_2_number_of_qubits)
-    new_circuit_2 = gr4.quantum_circuit_creator(circuit_part_2)
-    print(new_circuit_2.draw())
-    circuit_part_3 = gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits)
-    new_circuit_3 = gr4.quantum_circuit_creator(circuit_part_3)
-    print(new_circuit_3.draw())
+    # circuit_part_1 = gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits)
+    # new_circuit_1 = gr4.quantum_circuit_creator(circuit_part_1)
+    # print(new_circuit_1.draw())
+    # circuit_part_2 = gr4.quantum_circuit_matrix_part_getter(backend_2_number_of_qubits)
+    # new_circuit_2 = gr4.quantum_circuit_creator(circuit_part_2)
+    # print(new_circuit_2.draw())
+    # circuit_part_3 = gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits)
+    # new_circuit_3 = gr4.quantum_circuit_creator(circuit_part_3)
+    # print(new_circuit_3.draw())
 
     # IDEE: partitionarea matricei circuitului sa fie facuta de DASK si apoi comparat cu varianta mea de partitionare.
     # De efectuat apoi teste cu cele doua proceduri (Dask si Radu) atat la calculatoare cuantice cat si la simulatoare cuantice.
 
 
-    # lc = LocalCluster()
-    # lc.scale(10)
-    # client = Client(lc)
-    # future1 = client.submit(send_to_kingdom, 'ibmq_lima', circuit_6_3)
-    # wait(future1)
-    # future1.result()
-    # quantum_circuit_splitter(circuit_7_3, 5)
+    lc = LocalCluster()
+    lc.scale(10)
+    client = Client(lc)
+    future1 = client.submit(gr4.quantum_circuit_matrix_part_getter, backend_1_number_of_qubits)
+    wait(future1)
+    circuit_part_1 = future1.result()
+    future1 = client.submit(gr4.quantum_circuit_creator, circuit_part_1)
+    wait(future1)
+    new_circuit_1 = future1.result()
+    print(new_circuit_1.draw())
 
 
 
