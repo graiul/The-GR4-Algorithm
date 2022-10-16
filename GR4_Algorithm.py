@@ -470,6 +470,9 @@ if __name__ == '__main__':
     new_circuit_3 = gr4.quantum_circuit_creator(circuit_part_3)
     print(new_circuit_3.draw())
 
+    # IDEE: partitionarea matricei circuitului sa fie facuta de DASK si apoi comparat cu varianta mea de partitionare.
+    # De efectuat apoi teste cu cele doua proceduri (Dask si Radu) atat la calculatoare cuantice cat si la simulatoare cuantice.
+
 
     # lc = LocalCluster()
     # lc.scale(10)
