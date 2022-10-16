@@ -235,7 +235,7 @@ class GR4_Algorithm(object):
         print()
         for item in part:
             print(item)
-        self.print_circuit_matrix_and_figure()
+        # self.print_circuit_matrix_and_figure()
         return part
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
@@ -274,9 +274,51 @@ class GR4_Algorithm(object):
         #         # print(circuit.draw())
         #         break
 
-    def quantum_circuit_creator(self, original_circuit, number_of_qubits_to_be_taken):
+    def quantum_circuit_creator(self, circuit_part):
     #     print("-------------------------------")
     #     print("\nQuantum circuit creator")
+        number_of_qubits_for_the_new_circuit = len(circuit_part)
+        circuit_part_trimmed = []
+        qreg = QuantumRegister(number_of_qubits_for_the_new_circuit, 'q')
+        creg = ClassicalRegister(number_of_qubits_for_the_new_circuit, 'c')
+        new_circuit = QuantumCircuit(qreg, creg)
+        # https://stackoverflow.com/questions/522563/accessing-the-index-in-for-loops
+        for i, qubit in enumerate(circuit_part):
+            index_for_trimming = qubit.index('measure')
+            # print(index_for_trimming)
+            # print(type(qubit))
+            qubit_trimmed = qubit[:index_for_trimming + 1]
+            # circuit_part_trimmed.append(qubit_trimmed)
+            # https://stackoverflow.com/questions/701802/how-do-i-execute-a-string-containing-python-code-in-python
+            for gate in qubit_trimmed:
+                # print(gate)
+                if gate != 'measure':
+                    if gate == 'reset' or gate == 'h' or \
+                            gate == 'z' or gate == 'y' or \
+                            gate == 'sdg' or gate == 'tdg' or \
+                            gate == 't' or gate == 'sx':
+                        exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
+                    if gate == 'rx' or gate == 'ry' or\
+                            gate == 'p' or gate == 'rz':
+                        # !!! Aici trebuie obtinuta faza din circuitul original,
+                        # la convertirea lui in matrice, pt ca nu va fi tot timpul pi/2
+                        # print("new_circuit." + str(gate) + "(pi/2, qreg[" + str(i) + "])")
+                        exec("new_circuit." + str(gate) + "(pi/2, qreg[" + str(i) + "])")
+                    elif gate == 'u':
+                        exec("new_circuit." + str(gate) + "(pi / 2, pi / 2, pi / 2, qreg[" + str(i) + "])")
+                # else:
+                #     exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
+                if gate == 'measure':
+                    exec("new_circuit.measure" + "(qreg[" + str(i) + "], creg[" + str(i) + "])")
+        return new_circuit
+        # for item in circuit_part_trimmed:
+        #     print(circuit_part_trimmed)
+
+
+
+
+            # for gate in qubit:
+            #     print(gate)
     #     print("-------------------------------")
     #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
     #     for gate in original_circuit.data:
@@ -418,9 +460,15 @@ if __name__ == '__main__':
     # Primul parametru este matricea aferenta circuitului.
     # Al doilea parametru este numarul de qubiti de care dispune fiecare echipament.
     # Va fi extras din matrice un numar de qubiti egal cu cel de mai sus.
-    gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits)
-    # quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_2_number_of_qubits)
-    # quantum_circuit_matrix_part_getter(circuit_converted_to_matrix, backend_3_number_of_qubits)
+    circuit_part_1 = gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits)
+    new_circuit_1 = gr4.quantum_circuit_creator(circuit_part_1)
+    print(new_circuit_1.draw())
+    circuit_part_2 = gr4.quantum_circuit_matrix_part_getter(backend_2_number_of_qubits)
+    new_circuit_2 = gr4.quantum_circuit_creator(circuit_part_2)
+    print(new_circuit_2.draw())
+    circuit_part_3 = gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits)
+    new_circuit_3 = gr4.quantum_circuit_creator(circuit_part_3)
+    print(new_circuit_3.draw())
 
 
     # lc = LocalCluster()
