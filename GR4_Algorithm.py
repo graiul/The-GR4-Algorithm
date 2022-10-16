@@ -292,6 +292,7 @@ class GR4_Algorithm(object):
             # https://stackoverflow.com/questions/701802/how-do-i-execute-a-string-containing-python-code-in-python
             for gate in qubit_trimmed:
                 # print(gate)
+                # !!! Aici trebuie adaugate mai multe porti.
                 if gate != 'measure':
                     if gate == 'reset' or gate == 'h' or \
                             gate == 'z' or gate == 'y' or \
