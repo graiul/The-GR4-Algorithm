@@ -481,13 +481,16 @@ if __name__ == '__main__':
     lc = LocalCluster()
     lc.scale(10)
     client = Client(lc)
-    future1 = client.submit(gr4.quantum_circuit_matrix_part_getter, backend_1_number_of_qubits)
+    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits))
     # wait(future1)
     # circuit_part_1 = future1.result()
-    future2 = client.submit(gr4.quantum_circuit_creator, future1.result())
+    future2 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_2_number_of_qubits))
     # wait(future2)
     # new_circuit_1 = future2.result()
+    future3 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits))
+    print(future1.result().draw())
     print(future2.result().draw())
+    print(future3.result().draw())
 
 
 
