@@ -299,7 +299,8 @@ class GR4_Algorithm(object):
                     if gate == 'reset' or gate == 'h' or \
                             gate == 'z' or gate == 'y' or \
                             gate == 'sdg' or gate == 'tdg' or \
-                            gate == 't' or gate == 'sx':
+                            gate == 't' or gate == 'sx' or \
+                            gate == 's':
                         exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                     if gate == 'rx' or gate == 'ry' or\
                             gate == 'p' or gate == 'rz':
@@ -481,12 +482,12 @@ if __name__ == '__main__':
     lc.scale(10)
     client = Client(lc)
     future1 = client.submit(gr4.quantum_circuit_matrix_part_getter, backend_1_number_of_qubits)
-    wait(future1)
-    circuit_part_1 = future1.result()
-    future1 = client.submit(gr4.quantum_circuit_creator, circuit_part_1)
-    wait(future1)
-    new_circuit_1 = future1.result()
-    print(new_circuit_1.draw())
+    # wait(future1)
+    # circuit_part_1 = future1.result()
+    future2 = client.submit(gr4.quantum_circuit_creator, future1.result())
+    # wait(future2)
+    # new_circuit_1 = future2.result()
+    print(future2.result().draw())
 
 
 
