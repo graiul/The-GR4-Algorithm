@@ -339,6 +339,96 @@ class GR4_Algorithm(object):
     #     print(original_circuit.data)
     #     print("-------------------------------")
 
+    # Va fi apelat pe fiecare proces Dask
+    def send_to_kingdom(self, quantum_backend_name, circuit_object):
+        # IBMQ.save_account('e6bbad0f51ab787aec48bed242c422777f1680f0428e19b34e19bbcd467a2faff2bdcedd0cbb04b19f4bb700f66900728f778d4bc8226785e6c35dc818374ac8',
+        #                   overwrite=True)
+        provider = IBMQ.load_account()
+        # print(IBMQ.providers())
+        # print(IBMQ.get_provider(hub='ibm-q', group='open', project='main'))
+
+        # backend = simulator = provider.get_backend('ibmq_qasm_simulator')
+        # backend = simulator = provider.get_backend('ibmq_lima')
+        backend = provider.get_backend(quantum_backend_name)
+
+        # # CIRCUITS
+
+        # #
+        # https://qiskit.org/documentation/getting_started.html
+        # # Create a Quantum Circuit acting on the q register
+        # circuit = QuantumCircuit(2, 2)
+        # # Add a H gate on qubit 0
+        # circuit.h(0)
+        # # Add a CX (CNOT) gate on control qubit 0 and target qubit 1
+        # circuit.cx(0, 1)
+        # # Map the quantum measurement to the classical bits
+        # circuit.measure([0,1], [0,1])
+        # #
+
+        # #
+        # https://quantum-computing.ibm.com/composer/docs/guide/grovers-algorithm
+        # Grover pentru 00
+        # qreg_q = QuantumRegister(2, 'q')
+        # creg_c = ClassicalRegister(2, 'c')
+        # circuit = QuantumCircuit(qreg_q, creg_c)
+        # circuit.reset(qreg_q[0])
+        # circuit.reset(qreg_q[1])
+        # circuit.h(qreg_q[1])
+        # circuit.h(qreg_q[0])
+        # circuit.s(qreg_q[1])
+        # circuit.s(qreg_q[0])
+        # circuit.h(qreg_q[1])
+        # circuit.cx(qreg_q[0], qreg_q[1])
+        # circuit.s(qreg_q[0])
+        # circuit.h(qreg_q[1])
+        # circuit.h(qreg_q[0])
+        # circuit.s(qreg_q[1])
+        # circuit.x(qreg_q[0])
+        # circuit.h(qreg_q[1])
+        # circuit.x(qreg_q[1])
+        # circuit.h(qreg_q[1])
+        # circuit.cx(qreg_q[0], qreg_q[1])
+        # circuit.x(qreg_q[0])
+        # circuit.h(qreg_q[1])
+        # circuit.h(qreg_q[0])
+        # circuit.x(qreg_q[1])
+        # circuit.h(qreg_q[1])
+        # circuit.measure(qreg_q[0], creg_c[0])
+        # circuit.measure(qreg_q[1], creg_c[1])
+
+        # Test nr 1, rulat neparalel in 23 MAR 2021
+        # si paralel in 24 MAR 2021
+
+
+
+
+
+        # VECHI
+        # https://qiskit.org/textbook/ch-algorithms/grover.html
+        # circuit = self.initialize_s(self.prepare_quantum_circuit(2), [0, 1])
+        # VECHI
+
+        # Execute the circuit on the qasm simulator
+        job = execute(circuit_object, backend, shots=8192)
+        # print(backend.name())
+
+        # #
+        # https://medium.com/analytics-vidhya/grovers-algorithm-in-python-c1dfa132e3af
+        #
+        from qiskit.tools.monitor import job_monitor
+        job_monitor(job, interval=2)
+        # #
+
+        # Grab results from the job
+        result = job.result()
+
+        # Returns counts
+        counts = result.get_counts(circuit_object)
+        # print("\nTotal count for 00 and 11 are:",counts)
+        # print("\nTotal count for 00, 01, 10 and 11 are:",counts)
+        print("\nTotal counts:",counts)
+
+
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
     # # Circuit Test 7.3, 15 Qubits
@@ -488,9 +578,22 @@ if __name__ == '__main__':
     # wait(future2)
     # new_circuit_1 = future2.result()
     future3 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits))
-    print(future1.result().draw())
-    print(future2.result().draw())
-    print(future3.result().draw())
+    rez1 = future1.result()
+    rez2 = future2.result()
+    rez3 = future3.result()
+    print(rez1.draw())
+    print(rez2.draw())
+    print(rez3.draw())
+
+    print("IBM: ")
+    # backend1 = provider.get_backend('ibmq_belem')
+    # backend2 = provider.get_backend('ibmq_lima')
+    # backend3 = provider.get_backend('ibmq_quito')
+    future1 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez1)
+    # wait(future1)
+    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_lima', rez2)
+    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez3)
+    wait([future1, future2, future3])
 
 
 
