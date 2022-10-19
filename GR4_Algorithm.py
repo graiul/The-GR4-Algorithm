@@ -428,6 +428,14 @@ class GR4_Algorithm(object):
         # print("\nTotal count for 00, 01, 10 and 11 are:",counts)
         print("\nTotal counts:",counts)
 
+    def obtain_quantum_backend_number_of_qubits(self, quantum_backend_name):
+        # IBMQ.save_account('e6bbad0f51ab787aec48bed242c422777f1680f0428e19b34e19bbcd467a2faff2bdcedd0cbb04b19f4bb700f66900728f778d4bc8226785e6c35dc818374ac8',
+        #                   overwrite=True)
+        provider = IBMQ.load_account()
+        backend = provider.get_backend(quantum_backend_name)
+        backend_number_of_qubits = backend.configuration().n_qubits
+        return backend_number_of_qubits
+
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
@@ -571,13 +579,13 @@ if __name__ == '__main__':
     lc = LocalCluster()
     lc.scale(10)
     client = Client(lc)
-    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_1_number_of_qubits))
+    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
     # wait(future1)
     # circuit_part_1 = future1.result()
-    future2 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_2_number_of_qubits))
+    future2 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_lima')))
     # wait(future2)
     # new_circuit_1 = future2.result()
-    future3 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(backend_3_number_of_qubits))
+    future3 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
     rez1 = future1.result()
     rez2 = future2.result()
     rez3 = future3.result()
