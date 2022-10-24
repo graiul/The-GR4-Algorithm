@@ -230,12 +230,21 @@ class GR4_Algorithm(object):
     def quantum_circuit_matrix_part_getter(self, nr_of_qubits_per_part):
         # https://www.geeksforgeeks.org/python-list-slicing/
         part = self.circuit_matrix[0:nr_of_qubits_per_part]
+
+        # Tutorial Dask Lock
+        # https://www.youtube.com/watch?v=Q-Y3BR1u7c0&t=180s
+        from dask.distributed import Lock
+        lock = Lock()
+        lock.acquire()
         # https://stackoverflow.com/questions/497426/deleting-multiple-elements-from-a-list
-        del self.circuit_matrix[0:nr_of_qubits_per_part]
+        del self.circuit_matrix[0:nr_of_qubits_per_part] # Aici trebuie paralelizat
+        lock.release()
+
         print()
         for item in part:
             print(item)
         # self.print_circuit_matrix_and_figure()
+        # exit(0)
         return part
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
@@ -530,24 +539,137 @@ if __name__ == '__main__':
     circuit_7_3.measure(qreg_q_7_3[13], creg_c_7_3[13])
     circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
-    # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
-    from qiskit.test.mock import FakeProvider
-    provider = FakeProvider()
-    backends = provider.backends()
-    backend_1 = provider.get_backend('fake_belem')
-    backend_2 = provider.get_backend('fake_lima')
-    backend_3 = provider.get_backend('fake_quito')
-    backend_name_1 = backend_1.name()
-    backend_name_2 = backend_2.name()
-    backend_name_3 = backend_3.name()
-    backend_1_number_of_qubits = backend_1.configuration().n_qubits
-    backend_2_number_of_qubits = backend_2.configuration().n_qubits
-    backend_3_number_of_qubits = backend_3.configuration().n_qubits
+    # 25 qubit circuit
+    qreg_q_25 = QuantumRegister(25, 'q')
+    creg_c_25 = ClassicalRegister(25, 'c')
+    circuit_25 = QuantumCircuit(qreg_q_25, creg_c_25)
+    for i in range(0, 25):
+        # print(i)
+        circuit_25.reset(qreg_q_25[i])
+        circuit_25.h(qreg_q_25[i])
+    circuit_25.cx(qreg_q_25[0], qreg_q_25[1])
+    circuit_25.rz(pi / 2, qreg_q_25[2])
+    circuit_25.h(qreg_q_25[0])
+    circuit_25.barrier(qreg_q_25[1])
+    circuit_25.y(qreg_q_25[0])
+    circuit_25.ch(qreg_q_25[2], qreg_q_25[1])
+    circuit_25.y(qreg_q_25[1])
+    circuit_25.y(qreg_q_25[2])
+    circuit_25.z(qreg_q_25[3])
+    circuit_25.p(pi / 2, qreg_q_25[4])
+    circuit_25.ry(pi / 2, qreg_q_25[5])
+    circuit_25.u(pi / 2, pi / 2, pi / 2, qreg_q_25[6])
+    circuit_25.y(qreg_q_25[3])
+    circuit_25.y(qreg_q_25[4])
+    circuit_25.y(qreg_q_25[5])
+    circuit_25.y(qreg_q_25[6])
+    circuit_25.h(qreg_q_25[3])
+    circuit_25.h(qreg_q_25[4])
+    circuit_25.h(qreg_q_25[5])
+    circuit_25.h(qreg_q_25[6])
+    circuit_25.rz(pi / 2, qreg_q_25[3])
+    circuit_25.sdg(qreg_q_25[4])
+    circuit_25.t(qreg_q_25[5])
+    circuit_25.s(qreg_q_25[6])
+    circuit_25.h(qreg_q_25[3])
+    circuit_25.h(qreg_q_25[4])
+    circuit_25.h(qreg_q_25[5])
+    circuit_25.h(qreg_q_25[6])
+    circuit_25.z(qreg_q_25[7])
+    circuit_25.sx(qreg_q_25[8])
+    circuit_25.p(pi / 2, qreg_q_25[9])
+    circuit_25.rz(pi / 2, qreg_q_25[10])
+    circuit_25.y(qreg_q_25[7])
+    circuit_25.y(qreg_q_25[8])
+    circuit_25.y(qreg_q_25[9])
+    circuit_25.y(qreg_q_25[10])
+    circuit_25.h(qreg_q_25[7])
+    circuit_25.h(qreg_q_25[8])
+    circuit_25.h(qreg_q_25[9])
+    circuit_25.h(qreg_q_25[10])
+    circuit_25.t(qreg_q_25[7])
+    circuit_25.z(qreg_q_25[8])
+    circuit_25.sxdg(qreg_q_25[9])
+    circuit_25.rx(pi / 2, qreg_q_25[10])
+    circuit_25.x(qreg_q_25[11])
+    circuit_25.cx(qreg_q_25[12], qreg_q_25[13])
+    circuit_25.ccx(qreg_q_25[11], qreg_q_25[12], qreg_q_25[13])
+    circuit_25.swap(qreg_q_25[11], qreg_q_25[12])
+    circuit_25.id(qreg_q_25[13])
+    circuit_25.t(qreg_q_25[11])
+    circuit_25.s(qreg_q_25[12])
+    circuit_25.z(qreg_q_25[13])
+    circuit_25.tdg(qreg_q_25[11])
+    circuit_25.sdg(qreg_q_25[12])
+    circuit_25.p(pi / 2, qreg_q_25[13])
+    circuit_25.h(qreg_q_25[11])
+    circuit_25.y(qreg_q_25[11])
+    circuit_25.rx(pi / 2, qreg_q_25[14])
+    circuit_25.u(pi / 2, pi / 2, pi / 2, qreg_q_25[16])
+    circuit_25.swap(qreg_q_25[14], qreg_q_25[15])
+    circuit_25.rz(pi / 2, qreg_q_25[16])
+    circuit_25.s(qreg_q_25[14])
+    circuit_25.y(qreg_q_25[16])
+    circuit_25.cx(qreg_q_25[14], qreg_q_25[15])
+    circuit_25.ry(pi / 2, qreg_q_25[14])
+    circuit_25.sx(qreg_q_25[15])
+    circuit_25.z(qreg_q_25[14])
+    circuit_25.s(qreg_q_25[15])
+    circuit_25.y(qreg_q_25[14])
+    circuit_25.y(qreg_q_25[15])
+    circuit_25.cx(qreg_q_25[17], qreg_q_25[18])
+    circuit_25.y(qreg_q_25[18])
+    circuit_25.y(qreg_q_25[18])
+    circuit_25.y(qreg_q_25[18])
+    circuit_25.ccx(qreg_q_25[17], qreg_q_25[18], qreg_q_25[19])
+    circuit_25.h(qreg_q_25[17])
+    circuit_25.h(qreg_q_25[19])
+    circuit_25.sx(qreg_q_25[20])
+    circuit_25.rz(pi / 2, qreg_q_25[21])
+    circuit_25.s(qreg_q_25[22])
+    circuit_25.h(qreg_q_25[20])
+    circuit_25.rz(pi / 2, qreg_q_25[22])
+    circuit_25.rx(pi / 2, qreg_q_25[20])
+    circuit_25.ccx(qreg_q_25[20], qreg_q_25[21], qreg_q_25[22])
+    circuit_25.h(qreg_q_25[20])
+    circuit_25.p(pi / 2, qreg_q_25[21])
+    circuit_25.sdg(qreg_q_25[22])
+    circuit_25.ry(pi / 2, qreg_q_25[21])
+    circuit_25.y(qreg_q_25[21])
+    circuit_25.id(qreg_q_25[23])
+    circuit_25.t(qreg_q_25[23])
+    circuit_25.rx(pi / 2, qreg_q_25[23])
+    circuit_25.y(qreg_q_25[23])
+    circuit_25.t(qreg_q_25[24])
+    circuit_25.u(pi / 2, pi / 2, pi / 2, qreg_q_25[24])
+    circuit_25.y(qreg_q_25[24])
+    for i in range(0, 25):
+        circuit_25.measure(qreg_q_25[i], creg_c_25[i])
 
-    print(backends)
-    print("Backend name:", backend_name_1, ". It has a capacity of", backend_1_number_of_qubits, "qubits.")
-    print("Backend name:", backend_name_2, ". It has a capacity of", backend_2_number_of_qubits, "qubits.")
-    print("Backend name:", backend_name_3, ". It has a capacity of", backend_3_number_of_qubits, "qubits.")
+    # Aici valoarea lui fold poate pagina afisarea circuitului
+    # in consola astfel incat sa nu fie prea lat
+    print(circuit_25.draw(fold=-1))
+    exit(0)
+
+    # Fake backends for easy testing.
+    # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
+    # from qiskit.test.mock import FakeProvider
+    # provider = FakeProvider()
+    # backends = provider.backends()
+    # backend_1 = provider.get_backend('fake_belem')
+    # backend_2 = provider.get_backend('fake_lima')
+    # backend_3 = provider.get_backend('fake_quito')
+    # backend_name_1 = backend_1.name()
+    # backend_name_2 = backend_2.name()
+    # backend_name_3 = backend_3.name()
+    # backend_1_number_of_qubits = backend_1.configuration().n_qubits
+    # backend_2_number_of_qubits = backend_2.configuration().n_qubits
+    # backend_3_number_of_qubits = backend_3.configuration().n_qubits
+    #
+    # print(backends)
+    # print("Backend name:", backend_name_1, ". It has a capacity of", backend_1_number_of_qubits, "qubits.")
+    # print("Backend name:", backend_name_2, ". It has a capacity of", backend_2_number_of_qubits, "qubits.")
+    # print("Backend name:", backend_name_3, ". It has a capacity of", backend_3_number_of_qubits, "qubits.")
 
     # exit(0)
 
