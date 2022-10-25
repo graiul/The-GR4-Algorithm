@@ -190,6 +190,14 @@ class GR4_Algorithm(object):
         j = 0
         for gate in self.circuit.data:
             #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
+            # print(gate)
+            # Acest "if" este pentru cazul cand se folosesc porti care includ mai multi qubiti
+            # precum cx sau ccx.
+            # Pentru aceste porti inca nu am adaptat conversia circuitului in matrice.
+            # Astfel, ca si limitare, pe moment GR4 foloseste circuite fara astfel de porti.
+            # if gate[0].name == 'cx':
+            #     first_qubit_acted_on = int(str(gate[1]).split("'),")[1].split("), Qubit(QuantumRegister(")[0])
+            # else:
             qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
             gate_name = gate[0].name
             # print('\ngate name:', gate_name)
@@ -208,7 +216,7 @@ class GR4_Algorithm(object):
 
     def print_circuit_matrix_and_figure(self, ):
         print("\nQuantum circuit figure: ")
-        print(self.circuit.draw())
+        print(self.circuit.draw(fold=-1))
         print("\nCircuit converted to matrix: ")
         i = 0
         for item in self.circuit_matrix:
@@ -547,12 +555,13 @@ if __name__ == '__main__':
         # print(i)
         circuit_25.reset(qreg_q_25[i])
         circuit_25.h(qreg_q_25[i])
-    circuit_25.cx(qreg_q_25[0], qreg_q_25[1])
+    # circuit_25.cx(qreg_q_25[0], qreg_q_25[1])
     circuit_25.rz(pi / 2, qreg_q_25[2])
-    circuit_25.h(qreg_q_25[0])
+    # circuit_25.h(qreg_q_25[0]) # Aici va fi un h langa un al h, care se anuleaza unul pe celalalt,
+    # asa ca nu il folosesc acesta
     circuit_25.barrier(qreg_q_25[1])
     circuit_25.y(qreg_q_25[0])
-    circuit_25.ch(qreg_q_25[2], qreg_q_25[1])
+    # circuit_25.ch(qreg_q_25[2], qreg_q_25[1])
     circuit_25.y(qreg_q_25[1])
     circuit_25.y(qreg_q_25[2])
     circuit_25.z(qreg_q_25[3])
@@ -592,9 +601,9 @@ if __name__ == '__main__':
     circuit_25.sxdg(qreg_q_25[9])
     circuit_25.rx(pi / 2, qreg_q_25[10])
     circuit_25.x(qreg_q_25[11])
-    circuit_25.cx(qreg_q_25[12], qreg_q_25[13])
-    circuit_25.ccx(qreg_q_25[11], qreg_q_25[12], qreg_q_25[13])
-    circuit_25.swap(qreg_q_25[11], qreg_q_25[12])
+    # circuit_25.cx(qreg_q_25[12], qreg_q_25[13])
+    # circuit_25.ccx(qreg_q_25[11], qreg_q_25[12], qreg_q_25[13])
+    # circuit_25.swap(qreg_q_25[11], qreg_q_25[12])
     circuit_25.id(qreg_q_25[13])
     circuit_25.t(qreg_q_25[11])
     circuit_25.s(qreg_q_25[12])
@@ -606,22 +615,22 @@ if __name__ == '__main__':
     circuit_25.y(qreg_q_25[11])
     circuit_25.rx(pi / 2, qreg_q_25[14])
     circuit_25.u(pi / 2, pi / 2, pi / 2, qreg_q_25[16])
-    circuit_25.swap(qreg_q_25[14], qreg_q_25[15])
+    # circuit_25.swap(qreg_q_25[14], qreg_q_25[15])
     circuit_25.rz(pi / 2, qreg_q_25[16])
     circuit_25.s(qreg_q_25[14])
     circuit_25.y(qreg_q_25[16])
-    circuit_25.cx(qreg_q_25[14], qreg_q_25[15])
+    # circuit_25.cx(qreg_q_25[14], qreg_q_25[15])
     circuit_25.ry(pi / 2, qreg_q_25[14])
     circuit_25.sx(qreg_q_25[15])
     circuit_25.z(qreg_q_25[14])
     circuit_25.s(qreg_q_25[15])
     circuit_25.y(qreg_q_25[14])
     circuit_25.y(qreg_q_25[15])
-    circuit_25.cx(qreg_q_25[17], qreg_q_25[18])
+    # circuit_25.cx(qreg_q_25[17], qreg_q_25[18])
     circuit_25.y(qreg_q_25[18])
     circuit_25.y(qreg_q_25[18])
     circuit_25.y(qreg_q_25[18])
-    circuit_25.ccx(qreg_q_25[17], qreg_q_25[18], qreg_q_25[19])
+    # circuit_25.ccx(qreg_q_25[17], qreg_q_25[18], qreg_q_25[19])
     circuit_25.h(qreg_q_25[17])
     circuit_25.h(qreg_q_25[19])
     circuit_25.sx(qreg_q_25[20])
@@ -630,7 +639,7 @@ if __name__ == '__main__':
     circuit_25.h(qreg_q_25[20])
     circuit_25.rz(pi / 2, qreg_q_25[22])
     circuit_25.rx(pi / 2, qreg_q_25[20])
-    circuit_25.ccx(qreg_q_25[20], qreg_q_25[21], qreg_q_25[22])
+    # circuit_25.ccx(qreg_q_25[20], qreg_q_25[21], qreg_q_25[22])
     circuit_25.h(qreg_q_25[20])
     circuit_25.p(pi / 2, qreg_q_25[21])
     circuit_25.sdg(qreg_q_25[22])
@@ -648,8 +657,8 @@ if __name__ == '__main__':
 
     # Aici valoarea lui fold poate pagina afisarea circuitului
     # in consola astfel incat sa nu fie prea lat
-    print(circuit_25.draw(fold=-1))
-    exit(0)
+    # print(circuit_25.draw(fold=-1))
+    # exit(0)
 
     # Fake backends for easy testing.
     # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
@@ -674,9 +683,14 @@ if __name__ == '__main__':
     # exit(0)
 
     # Se initializeaza algoritmul GR4
-    gr4 = GR4_Algorithm(circuit_7_3)
+    # gr4 = GR4_Algorithm(circuit_7_3)
+    gr4 = GR4_Algorithm(circuit_25)
 
-    nr_of_qubits = circuit_7_3.num_qubits
+    # Este preluat numarul de qubiti ai circuitului
+    # nr_of_qubits = circuit_7_3.num_qubits
+    nr_of_qubits = circuit_25.num_qubits
+
+
     circuit_converted_to_matrix = copy.deepcopy(gr4.convert_circuit_to_matrix(nr_of_qubits))
     gr4.print_circuit_matrix_and_figure()
     # exit(0)
@@ -701,30 +715,65 @@ if __name__ == '__main__':
     lc = LocalCluster()
     lc.scale(10)
     client = Client(lc)
-    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
+    future1 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
     # wait(future1)
     # circuit_part_1 = future1.result()
-    future2 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_lima')))
+    future2 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
     # wait(future2)
     # new_circuit_1 = future2.result()
-    future3 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+    future3 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_statevector'))
+                                5))
+
+    future4 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_mps')))
+                                4))
+    future5 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('ibmq_qasm_simulator')))
+                                4))
     rez1 = future1.result()
     rez2 = future2.result()
     rez3 = future3.result()
-    print(rez1.draw())
-    print(rez2.draw())
-    print(rez3.draw())
+    rez4 = future4.result()
+    rez5 = future5.result()
+
+    print(rez1.draw(fold=-1))
+    print(rez2.draw(fold=-1))
+    print(rez3.draw(fold=-1))
+    print(rez4.draw(fold=-1))
+    print(rez5.draw(fold=-1))
+
 
     print("IBM: ")
     # backend1 = provider.get_backend('ibmq_belem')
     # backend2 = provider.get_backend('ibmq_lima')
     # backend3 = provider.get_backend('ibmq_quito')
-    future1 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez1)
+    future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
     # wait(future1)
-    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_lima', rez2)
-    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez3)
-    wait([future1, future2, future3])
+    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
+    future3 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez3)
+    future4 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez4)
+    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez5)
 
+    wait([future1, future2, future3, future4, future5])
+
+    # In cazul simulatoarelor trebuie avut in vedere ca ele au mai mult de 5 qubiti.
+    # In cazul unui circuit cu 25 de qubiti si urmatoarele echipamente:
+    # ibm_oslo, GR4 extrage automat 7 qubiti
+    # ibmq_quito, GR4 extrage automat 5 qubiti
+    # Mai raman 13 qubiti neextrasi.
+    # Pentru simulator_statevector care are 32 de qubiti, GR4 trebuie sa extraga 32 de qubiti, dar nu are de unde.
+    # Asa ca ii extraeg pe cei 13 ramasi, ceea ce nu ar fi o problema, dar simulator_mps si ibmq_qasm_simulator nu ar mai avea
+    # qubiti de extras, asa ca acele doua procese vor da eroare.
+    # In acest caz, am alocat manual nr de qubiti pentru cele trei simulatoare mentionate, pt ca pe moment am doar un
+    # circuit de 25 de qubiti.
 
 
 
