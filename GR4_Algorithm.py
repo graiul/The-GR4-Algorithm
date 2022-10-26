@@ -95,9 +95,6 @@ class GR4_Algorithm(object):
         # print("\nTotal count for 00, 01, 10 and 11 are:", counts)
         print("\nCounts: ", counts)
 
-
-
-
 # https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
 
 # for gate in circuit.data:
@@ -236,14 +233,16 @@ class GR4_Algorithm(object):
     # https://quantumcomputing.stackexchange.com/questions/17375/is-there-any-way-to-obtain-the-number-of-qubits-of-a-given-backend-in-qiskit
 
     def quantum_circuit_matrix_part_getter(self, nr_of_qubits_per_part):
+        from dask.distributed import Lock
+        lock = Lock()
+        lock.acquire()
+
         # https://www.geeksforgeeks.org/python-list-slicing/
         part = self.circuit_matrix[0:nr_of_qubits_per_part]
 
         # Tutorial Dask Lock
         # https://www.youtube.com/watch?v=Q-Y3BR1u7c0&t=180s
-        from dask.distributed import Lock
-        lock = Lock()
-        lock.acquire()
+
         # https://stackoverflow.com/questions/497426/deleting-multiple-elements-from-a-list
         del self.circuit_matrix[0:nr_of_qubits_per_part] # Aici trebuie paralelizat
         lock.release()
@@ -433,17 +432,31 @@ class GR4_Algorithm(object):
         # https://medium.com/analytics-vidhya/grovers-algorithm-in-python-c1dfa132e3af
         #
         from qiskit.tools.monitor import job_monitor
+
+        # https://stackoverflow.com/questions/19110288/make-processes-output-one-at-a-time-in-python
+        from dask.distributed import Lock
+        lock = Lock()
+        lock.acquire()
         job_monitor(job, interval=2)
         # #
 
         # Grab results from the job
         result = job.result()
 
+        # Se va afisa circuitul nou format
+        print(circuit_object.draw(fold=-1))
+
+        # Se va afisa id-ul jobului
+        # https://quantumcomputing.stackexchange.com/questions/13883/can-i-get-the-job-variable-from-the-job-id
+        print("Job id: ", job.job_id())
+
         # Returns counts
         counts = result.get_counts(circuit_object)
         # print("\nTotal count for 00 and 11 are:",counts)
         # print("\nTotal count for 00, 01, 10 and 11 are:",counts)
         print("\nTotal counts:",counts)
+
+        lock.release()
 
     def obtain_quantum_backend_number_of_qubits(self, quantum_backend_name):
         # IBMQ.save_account('e6bbad0f51ab787aec48bed242c422777f1680f0428e19b34e19bbcd467a2faff2bdcedd0cbb04b19f4bb700f66900728f778d4bc8226785e6c35dc818374ac8',
@@ -744,11 +757,11 @@ if __name__ == '__main__':
     rez4 = future4.result()
     rez5 = future5.result()
 
-    print(rez1.draw(fold=-1))
-    print(rez2.draw(fold=-1))
-    print(rez3.draw(fold=-1))
-    print(rez4.draw(fold=-1))
-    print(rez5.draw(fold=-1))
+    # print(rez1.draw(fold=-1))
+    # print(rez2.draw(fold=-1))
+    # print(rez3.draw(fold=-1))
+    # print(rez4.draw(fold=-1))
+    # print(rez5.draw(fold=-1))
 
 
     print("IBM: ")
