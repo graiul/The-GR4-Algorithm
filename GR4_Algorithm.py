@@ -1,11 +1,12 @@
 import copy
+import multiprocessing
 
 from numpy import pi
 from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.providers.ibmq import IBMQ
 from distributed import Client, LocalCluster, Worker, wait, progress
 # https://stackoverflow.com/questions/44144584/typeerror-cant-pickle-thread-lock-objects
-from multiprocessing import Queue
+from queue import Queue
 
 class GR4_Algorithm(object):
 
@@ -235,11 +236,11 @@ class GR4_Algorithm(object):
         print("\nCircuit converted to matrix: ")
         i = 0
         for qubit in self.circuit_matrix:
-            gates = []
-            for j in range(0, qubit.qsize()):
-                gates.append(qubit.get())
+            # gates = []
+            # for j in range(0, qubit.qsize()):
+            #     gates.append(qubit.get())
             # https://stackoverflow.com/questions/54656387/printing-contents-of-a-queue-in-python
-            print("Qubit", i, gates)
+            print("Qubit", i, list(qubit.queue))
             i = i + 1
             # print(item)
             # print()
@@ -271,17 +272,18 @@ class GR4_Algorithm(object):
 
         print()
         part_converted = []
-
+        # from multiprocessing import Queue
+        # qubit_queue_multiprocessing = Queue
         for qubit in part:
-            gates = []
-            for j in range(0, qubit.qsize()):
-                gates.append(qubit.get())
-            part_converted.append(gates)
-        for item_converted in part_converted:
-            print(item_converted)
-        # print(type(part_converted))
-        # self.print_circuit_matrix_and_figure()
-        exit(0)
+            # gates = []
+            # for j in range(0, qubit.qsize()):
+            #     gates.append(qubit.get())
+            # for gate in list(qubit.queue):
+            #     qubit_queue_multiprocessing.put(gate)
+            part_converted.append(list(qubit.queue))
+        # for item_converted in part_converted:
+        #     print(item_converted)
+        # exit(0)
         return part_converted
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
