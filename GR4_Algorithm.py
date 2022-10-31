@@ -4,6 +4,8 @@ from numpy import pi
 from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.providers.ibmq import IBMQ
 from distributed import Client, LocalCluster, Worker, wait, progress
+# https://stackoverflow.com/questions/44144584/typeerror-cant-pickle-thread-lock-objects
+from multiprocessing import Queue
 
 class GR4_Algorithm(object):
 
@@ -184,8 +186,9 @@ class GR4_Algorithm(object):
         # https://stackoverflow.com/questions/6376886/what-is-the-best-way-to-create-a-string-array-in-python
         # In loc de 15 se va pune automat nr de qubiti pentru numarul de linii.
         # Numarul de coloane poate fi mai mare, in functie de nr maxim de porti pe care vrea utilizatorul sa plaseze pe cate un qubit.
-        gates_for_each_qubit = [["" for j in range(50)] for i in range(circuit_number_of_qubits)]
-        j = 0
+        # gates_for_each_qubit = [["" for j in range(50)] for i in range(circuit_number_of_qubits)]
+        gates_for_each_qubit = [Queue(maxsize=50) for i in range(circuit_number_of_qubits)]
+        x = 0
         for gate in self.circuit.data:
             #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
             # print(gate)
@@ -199,26 +202,44 @@ class GR4_Algorithm(object):
             qubit_acted_on = int(str(gate[1]).split("'),")[1].split(")]")[0])
             gate_name = gate[0].name
             # print('\ngate name:', gate_name)
-            # print('qubit(s) acted on:')
-            # print(qubit_acted_on)
+            # print('qubit(s) acted on:', qubit_acted_on)
+
+            # Folosesc queue pentru a evita suprascrierea sau plasarea eronata a portilor in matrice.
+            # https://www.geeksforgeeks.org/queue-in-python/
+            gates_for_each_qubit[qubit_acted_on].put(gate_name)
+
+            #  ## VECHI
             # Pentru a evita suprascrierea unei valori, astfel evitand disparitia unei porti,
             # se verifica daca exista un element deja pe pozitia selectata.
-            if gates_for_each_qubit[qubit_acted_on][j] == "":
-                gates_for_each_qubit[qubit_acted_on][j] = gate_name
-            else:
-                # Daca exista deja un element pe pozitia selectata, noua poarta/operatie este plasata pe pozitia urmatoare.
-                gates_for_each_qubit[qubit_acted_on][j+1] = gate_name
-            if qubit_acted_on == 14: # Nr de qubiti ai circuitului -1, daca am ajuns la ultimul qubit, pt ca numerotarea incepe de la 0.
-                j = j+1
-        self.circuit_matrix = copy.deepcopy(gates_for_each_qubit)
+            # if gates_for_each_qubit[qubit_acted_on][x] == "":
+            #     gates_for_each_qubit[qubit_acted_on][x] = gate_name
+                # print(gates_for_each_qubit[qubit_acted_on][x])
+            # else:
+            #     # Daca exista deja un element pe pozitia selectata, noua poarta/operatie este plasata pe pozitia urmatoare.
+            #     # Decalez intai poarta existenta cu o pozitie la dreapta, iar in vechea pozitie pun noua poarta.
+            #     gates_for_each_qubit[qubit_acted_on][x+2] = gates_for_each_qubit[qubit_acted_on][x+1]
+            #     gates_for_each_qubit[qubit_acted_on][x+1] = gate_name
+
+            # Trec la coloana urmatoare
+            # if qubit_acted_on == circuit_number_of_qubits-1: # Nr de qubiti ai circuitului -1, daca am ajuns la ultimul qubit, pt ca numerotarea incepe de la 0.
+            #     x = x+1
+            #  ##
+
+        # self.circuit_matrix = copy.deepcopy(gates_for_each_qubit)
+        self.circuit_matrix = list(gates_for_each_qubit)
+
 
     def print_circuit_matrix_and_figure(self, ):
         print("\nQuantum circuit figure: ")
         print(self.circuit.draw(fold=-1))
         print("\nCircuit converted to matrix: ")
         i = 0
-        for item in self.circuit_matrix:
-            print("Qubit", i, item)
+        for qubit in self.circuit_matrix:
+            gates = []
+            for j in range(0, qubit.qsize()):
+                gates.append(qubit.get())
+            # https://stackoverflow.com/questions/54656387/printing-contents-of-a-queue-in-python
+            print("Qubit", i, gates)
             i = i + 1
             # print(item)
             # print()
@@ -239,6 +260,7 @@ class GR4_Algorithm(object):
 
         # https://www.geeksforgeeks.org/python-list-slicing/
         part = self.circuit_matrix[0:nr_of_qubits_per_part]
+        print(part)
 
         # Tutorial Dask Lock
         # https://www.youtube.com/watch?v=Q-Y3BR1u7c0&t=180s
@@ -248,11 +270,19 @@ class GR4_Algorithm(object):
         lock.release()
 
         print()
-        for item in part:
-            print(item)
+        part_converted = []
+
+        for qubit in part:
+            gates = []
+            for j in range(0, qubit.qsize()):
+                gates.append(qubit.get())
+            part_converted.append(gates)
+        for item_converted in part_converted:
+            print(item_converted)
+        # print(type(part_converted))
         # self.print_circuit_matrix_and_figure()
-        # exit(0)
-        return part
+        exit(0)
+        return part_converted
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
         # print("Qubits: ")
@@ -316,7 +346,9 @@ class GR4_Algorithm(object):
                             gate == 'z' or gate == 'y' or \
                             gate == 'sdg' or gate == 'tdg' or \
                             gate == 't' or gate == 'sx' or \
-                            gate == 's':
+                            gate == 's' or gate == 'barrier' or \
+                            gate == 'id':
+                        print("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                         exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                     if gate == 'rx' or gate == 'ry' or\
                             gate == 'p' or gate == 'rz':
@@ -330,13 +362,10 @@ class GR4_Algorithm(object):
                 #     exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                 if gate == 'measure':
                     exec("new_circuit.measure" + "(qreg[" + str(i) + "], creg[" + str(i) + "])")
+        # exit(0)
         return new_circuit
         # for item in circuit_part_trimmed:
         #     print(circuit_part_trimmed)
-
-
-
-
             # for gate in qubit:
             #     print(gate)
     #     print("-------------------------------")
@@ -413,96 +442,96 @@ class GR4_Algorithm(object):
 
 # https://github.com/dask/distributed/issues/2422
 if __name__ == '__main__':
-    # # Circuit Test 7.3, 15 Qubits
+    # # # Circuit Test 7.3, 15 Qubits
+    # #
+    # qreg_q_7_3 = QuantumRegister(15, 'q')
+    # creg_c_7_3 = ClassicalRegister(15, 'c')
+    # circuit_7_3 = QuantumCircuit(qreg_q_7_3, creg_c_7_3)
     #
-    qreg_q_7_3 = QuantumRegister(15, 'q')
-    creg_c_7_3 = ClassicalRegister(15, 'c')
-    circuit_7_3 = QuantumCircuit(qreg_q_7_3, creg_c_7_3)
-
-    circuit_7_3.reset(qreg_q_7_3[0])
-    circuit_7_3.reset(qreg_q_7_3[1])
-    circuit_7_3.reset(qreg_q_7_3[2])
-    circuit_7_3.reset(qreg_q_7_3[3])
-    circuit_7_3.reset(qreg_q_7_3[4])
-    circuit_7_3.reset(qreg_q_7_3[5])
-    circuit_7_3.reset(qreg_q_7_3[6])
-    circuit_7_3.reset(qreg_q_7_3[7])
-    circuit_7_3.reset(qreg_q_7_3[8])
-    circuit_7_3.reset(qreg_q_7_3[9])
-    circuit_7_3.reset(qreg_q_7_3[10])
-    circuit_7_3.reset(qreg_q_7_3[11])
-    circuit_7_3.reset(qreg_q_7_3[12])
-    circuit_7_3.reset(qreg_q_7_3[13])
-    circuit_7_3.reset(qreg_q_7_3[14])
-    circuit_7_3.h(qreg_q_7_3[0])
-    circuit_7_3.h(qreg_q_7_3[1])
-    circuit_7_3.h(qreg_q_7_3[2])
-    circuit_7_3.h(qreg_q_7_3[3])
-    circuit_7_3.h(qreg_q_7_3[4])
-    circuit_7_3.h(qreg_q_7_3[5])
-    circuit_7_3.h(qreg_q_7_3[6])
-    circuit_7_3.h(qreg_q_7_3[7])
-    circuit_7_3.h(qreg_q_7_3[8])
-    circuit_7_3.h(qreg_q_7_3[9])
-    circuit_7_3.h(qreg_q_7_3[10])
-    circuit_7_3.h(qreg_q_7_3[11])
-    circuit_7_3.h(qreg_q_7_3[12])
-    circuit_7_3.h(qreg_q_7_3[13])
-    circuit_7_3.h(qreg_q_7_3[14])
-    circuit_7_3.rx(pi / 2, qreg_q_7_3[0])
-    circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[1])
-    circuit_7_3.p(pi / 2, qreg_q_7_3[2])
-    circuit_7_3.z(qreg_q_7_3[3])
-    circuit_7_3.y(qreg_q_7_3[4])
-    circuit_7_3.t(qreg_q_7_3[5])
-    circuit_7_3.p(pi / 2, qreg_q_7_3[6])
-    circuit_7_3.y(qreg_q_7_3[7])
-    circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[8])
-    circuit_7_3.z(qreg_q_7_3[9])
-    circuit_7_3.sx(qreg_q_7_3[10])
-    circuit_7_3.z(qreg_q_7_3[11])
-    circuit_7_3.p(pi / 2, qreg_q_7_3[12])
-    circuit_7_3.ry(pi / 2, qreg_q_7_3[13])
-    circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[14])
-    circuit_7_3.s(qreg_q_7_3[0])
-    circuit_7_3.h(qreg_q_7_3[1])
-    circuit_7_3.h(qreg_q_7_3[2])
-    circuit_7_3.h(qreg_q_7_3[3])
-    circuit_7_3.h(qreg_q_7_3[4])
-    circuit_7_3.h(qreg_q_7_3[5])
-    circuit_7_3.h(qreg_q_7_3[6])
-    circuit_7_3.h(qreg_q_7_3[7])
-    circuit_7_3.h(qreg_q_7_3[8])
-    circuit_7_3.h(qreg_q_7_3[9])
-    circuit_7_3.h(qreg_q_7_3[10])
-    circuit_7_3.h(qreg_q_7_3[11])
-    circuit_7_3.h(qreg_q_7_3[12])
-    circuit_7_3.h(qreg_q_7_3[13])
-    circuit_7_3.h(qreg_q_7_3[14])
-    circuit_7_3.h(qreg_q_7_3[0])
-    circuit_7_3.tdg(qreg_q_7_3[3])
-    circuit_7_3.sdg(qreg_q_7_3[4])
-    circuit_7_3.rz(pi / 2, qreg_q_7_3[5])
-    circuit_7_3.sx(qreg_q_7_3[6])
-    circuit_7_3.sx(qreg_q_7_3[13])
-    circuit_7_3.y(qreg_q_7_3[14])
-    circuit_7_3.h(qreg_q_7_3[5])
-    circuit_7_3.h(qreg_q_7_3[13])
-    circuit_7_3.measure(qreg_q_7_3[0], creg_c_7_3[0])
-    circuit_7_3.measure(qreg_q_7_3[1], creg_c_7_3[1])
-    circuit_7_3.measure(qreg_q_7_3[2], creg_c_7_3[2])
-    circuit_7_3.measure(qreg_q_7_3[3], creg_c_7_3[3])
-    circuit_7_3.measure(qreg_q_7_3[4], creg_c_7_3[4])
-    circuit_7_3.measure(qreg_q_7_3[5], creg_c_7_3[5])
-    circuit_7_3.measure(qreg_q_7_3[6], creg_c_7_3[6])
-    circuit_7_3.measure(qreg_q_7_3[7], creg_c_7_3[7])
-    circuit_7_3.measure(qreg_q_7_3[8], creg_c_7_3[8])
-    circuit_7_3.measure(qreg_q_7_3[9], creg_c_7_3[9])
-    circuit_7_3.measure(qreg_q_7_3[10], creg_c_7_3[10])
-    circuit_7_3.measure(qreg_q_7_3[11], creg_c_7_3[11])
-    circuit_7_3.measure(qreg_q_7_3[12], creg_c_7_3[12])
-    circuit_7_3.measure(qreg_q_7_3[13], creg_c_7_3[13])
-    circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
+    # circuit_7_3.reset(qreg_q_7_3[0])
+    # circuit_7_3.reset(qreg_q_7_3[1])
+    # circuit_7_3.reset(qreg_q_7_3[2])
+    # circuit_7_3.reset(qreg_q_7_3[3])
+    # circuit_7_3.reset(qreg_q_7_3[4])
+    # circuit_7_3.reset(qreg_q_7_3[5])
+    # circuit_7_3.reset(qreg_q_7_3[6])
+    # circuit_7_3.reset(qreg_q_7_3[7])
+    # circuit_7_3.reset(qreg_q_7_3[8])
+    # circuit_7_3.reset(qreg_q_7_3[9])
+    # circuit_7_3.reset(qreg_q_7_3[10])
+    # circuit_7_3.reset(qreg_q_7_3[11])
+    # circuit_7_3.reset(qreg_q_7_3[12])
+    # circuit_7_3.reset(qreg_q_7_3[13])
+    # circuit_7_3.reset(qreg_q_7_3[14])
+    # circuit_7_3.h(qreg_q_7_3[0])
+    # circuit_7_3.h(qreg_q_7_3[1])
+    # circuit_7_3.h(qreg_q_7_3[2])
+    # circuit_7_3.h(qreg_q_7_3[3])
+    # circuit_7_3.h(qreg_q_7_3[4])
+    # circuit_7_3.h(qreg_q_7_3[5])
+    # circuit_7_3.h(qreg_q_7_3[6])
+    # circuit_7_3.h(qreg_q_7_3[7])
+    # circuit_7_3.h(qreg_q_7_3[8])
+    # circuit_7_3.h(qreg_q_7_3[9])
+    # circuit_7_3.h(qreg_q_7_3[10])
+    # circuit_7_3.h(qreg_q_7_3[11])
+    # circuit_7_3.h(qreg_q_7_3[12])
+    # circuit_7_3.h(qreg_q_7_3[13])
+    # circuit_7_3.h(qreg_q_7_3[14])
+    # circuit_7_3.rx(pi / 2, qreg_q_7_3[0])
+    # circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[1])
+    # circuit_7_3.p(pi / 2, qreg_q_7_3[2])
+    # circuit_7_3.z(qreg_q_7_3[3])
+    # circuit_7_3.y(qreg_q_7_3[4])
+    # circuit_7_3.t(qreg_q_7_3[5])
+    # circuit_7_3.p(pi / 2, qreg_q_7_3[6])
+    # circuit_7_3.y(qreg_q_7_3[7])
+    # circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[8])
+    # circuit_7_3.z(qreg_q_7_3[9])
+    # circuit_7_3.sx(qreg_q_7_3[10])
+    # circuit_7_3.z(qreg_q_7_3[11])
+    # circuit_7_3.p(pi / 2, qreg_q_7_3[12])
+    # circuit_7_3.ry(pi / 2, qreg_q_7_3[13])
+    # circuit_7_3.u(pi / 2, pi / 2, pi / 2, qreg_q_7_3[14])
+    # circuit_7_3.s(qreg_q_7_3[0])
+    # circuit_7_3.h(qreg_q_7_3[1])
+    # circuit_7_3.h(qreg_q_7_3[2])
+    # circuit_7_3.h(qreg_q_7_3[3])
+    # circuit_7_3.h(qreg_q_7_3[4])
+    # circuit_7_3.h(qreg_q_7_3[5])
+    # circuit_7_3.h(qreg_q_7_3[6])
+    # circuit_7_3.h(qreg_q_7_3[7])
+    # circuit_7_3.h(qreg_q_7_3[8])
+    # circuit_7_3.h(qreg_q_7_3[9])
+    # circuit_7_3.h(qreg_q_7_3[10])
+    # circuit_7_3.h(qreg_q_7_3[11])
+    # circuit_7_3.h(qreg_q_7_3[12])
+    # circuit_7_3.h(qreg_q_7_3[13])
+    # circuit_7_3.h(qreg_q_7_3[14])
+    # circuit_7_3.h(qreg_q_7_3[0])
+    # circuit_7_3.tdg(qreg_q_7_3[3])
+    # circuit_7_3.sdg(qreg_q_7_3[4])
+    # circuit_7_3.rz(pi / 2, qreg_q_7_3[5])
+    # circuit_7_3.sx(qreg_q_7_3[6])
+    # circuit_7_3.sx(qreg_q_7_3[13])
+    # circuit_7_3.y(qreg_q_7_3[14])
+    # circuit_7_3.h(qreg_q_7_3[5])
+    # circuit_7_3.h(qreg_q_7_3[13])
+    # circuit_7_3.measure(qreg_q_7_3[0], creg_c_7_3[0])
+    # circuit_7_3.measure(qreg_q_7_3[1], creg_c_7_3[1])
+    # circuit_7_3.measure(qreg_q_7_3[2], creg_c_7_3[2])
+    # circuit_7_3.measure(qreg_q_7_3[3], creg_c_7_3[3])
+    # circuit_7_3.measure(qreg_q_7_3[4], creg_c_7_3[4])
+    # circuit_7_3.measure(qreg_q_7_3[5], creg_c_7_3[5])
+    # circuit_7_3.measure(qreg_q_7_3[6], creg_c_7_3[6])
+    # circuit_7_3.measure(qreg_q_7_3[7], creg_c_7_3[7])
+    # circuit_7_3.measure(qreg_q_7_3[8], creg_c_7_3[8])
+    # circuit_7_3.measure(qreg_q_7_3[9], creg_c_7_3[9])
+    # circuit_7_3.measure(qreg_q_7_3[10], creg_c_7_3[10])
+    # circuit_7_3.measure(qreg_q_7_3[11], creg_c_7_3[11])
+    # circuit_7_3.measure(qreg_q_7_3[12], creg_c_7_3[12])
+    # circuit_7_3.measure(qreg_q_7_3[13], creg_c_7_3[13])
+    # circuit_7_3.measure(qreg_q_7_3[14], creg_c_7_3[14])
 
     # 25 qubit circuit
     qreg_q_25 = QuantumRegister(25, 'q')
@@ -672,65 +701,107 @@ if __name__ == '__main__':
     lc = LocalCluster()
     lc.scale(10)
     client = Client(lc)
-    future1 = client.submit(gr4.quantum_circuit_creator,
-                            gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
-    # wait(future1)
-    # circuit_part_1 = future1.result()
+
+    # ## Pentru a doua posibilitate, executie cu calculatoare cuantice
+    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
+
     future2 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
                                 gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
-    # wait(future2)
-    # new_circuit_1 = future2.result()
+
     future3 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_statevector'))
-                                5))
+                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
 
     future4 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_mps')))
-                                4))
+                                gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
+
     future5 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                # gr4.obtain_quantum_backend_number_of_qubits('ibmq_qasm_simulator')))
-                                4))
+                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+
     rez1 = future1.result()
     rez2 = future2.result()
     rez3 = future3.result()
     rez4 = future4.result()
     rez5 = future5.result()
 
-    # print(rez1.draw(fold=-1))
-    # print(rez2.draw(fold=-1))
-    # print(rez3.draw(fold=-1))
-    # print(rez4.draw(fold=-1))
-    # print(rez5.draw(fold=-1))
-
-
     print("IBM: ")
-    # backend1 = provider.get_backend('ibmq_belem')
-    # backend2 = provider.get_backend('ibmq_lima')
-    # backend3 = provider.get_backend('ibmq_quito')
+
     future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
-    # wait(future1)
     future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
-    future3 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez3)
-    future4 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez4)
-    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez5)
+    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez3)
+    future4 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez4)
+    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez5)
 
     wait([future1, future2, future3, future4, future5])
 
-    # In cazul simulatoarelor trebuie avut in vedere ca ele au mai mult de 5 qubiti.
-    # In cazul unui circuit cu 25 de qubiti si urmatoarele echipamente:
-    # ibm_oslo, GR4 extrage automat 7 qubiti
-    # ibmq_quito, GR4 extrage automat 5 qubiti
-    # Mai raman 13 qubiti neextrasi.
-    # Pentru simulator_statevector care are 32 de qubiti, GR4 trebuie sa extraga 32 de qubiti, dar nu are de unde.
-    # Asa ca ii extraeg pe cei 13 ramasi, ceea ce nu ar fi o problema, dar simulator_mps si ibmq_qasm_simulator nu ar mai avea
-    # qubiti de extras, asa ca acele doua procese vor da eroare.
-    # In acest caz, am alocat manual nr de qubiti pentru cele trei simulatoare mentionate, pt ca pe moment am doar un
-    # circuit de 25 de qubiti.
+    # ##
+
+    # # ## Pentru a treia posibilitate, executie calculatoare cuantice combinate cu simulatoare
+    # future1 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
+    # # wait(future1)
+    # # circuit_part_1 = future1.result()
+    # future2 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+    # # wait(future2)
+    # # new_circuit_1 = future2.result()
+    # future3 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             # gr4.obtain_quantum_backend_number_of_qubits('simulator_statevector'))
+    #                             5))
+    #
+    # future4 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             # gr4.obtain_quantum_backend_number_of_qubits('simulator_mps')))
+    #                             4))
+    # future5 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             # gr4.obtain_quantum_backend_number_of_qubits('ibmq_qasm_simulator')))
+    #                             4))
+    # rez1 = future1.result()
+    # rez2 = future2.result()
+    # rez3 = future3.result()
+    # rez4 = future4.result()
+    # rez5 = future5.result()
+    #
+    # # print(rez1.draw(fold=-1))
+    # # print(rez2.draw(fold=-1))
+    # # print(rez3.draw(fold=-1))
+    # # print(rez4.draw(fold=-1))
+    # # print(rez5.draw(fold=-1))
+    #
+    #
+    # print("IBM: ")
+    # # backend1 = provider.get_backend('ibmq_belem')
+    # # backend2 = provider.get_backend('ibmq_lima')
+    # # backend3 = provider.get_backend('ibmq_quito')
+    # future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
+    # # wait(future1)
+    # future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
+    # future3 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez3)
+    # future4 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez4)
+    # future5 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez5)
+    #
+    # wait([future1, future2, future3, future4, future5])
+    #
+    # # In cazul simulatoarelor trebuie avut in vedere ca ele au mai mult de 5 qubiti.
+    # # In cazul unui circuit cu 25 de qubiti si urmatoarele echipamente:
+    # # ibm_oslo, GR4 extrage automat 7 qubiti
+    # # ibmq_quito, GR4 extrage automat 5 qubiti
+    # # Mai raman 13 qubiti neextrasi.
+    # # Pentru simulator_statevector care are 32 de qubiti, GR4 trebuie sa extraga 32 de qubiti, dar nu are de unde.
+    # # Asa ca ii extraeg pe cei 13 ramasi, ceea ce nu ar fi o problema, dar simulator_mps si ibmq_qasm_simulator nu ar mai avea
+    # # qubiti de extras, asa ca acele doua procese vor da eroare.
+    # # In acest caz, am alocat manual nr de qubiti pentru cele trei simulatoare mentionate, pt ca pe moment am doar un
+    # # circuit de 25 de qubiti.
+    #
+    # # ##
+
 
 
 
