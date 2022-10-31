@@ -187,8 +187,16 @@ class GR4_Algorithm(object):
         # https://stackoverflow.com/questions/6376886/what-is-the-best-way-to-create-a-string-array-in-python
         # In loc de 15 se va pune automat nr de qubiti pentru numarul de linii.
         # Numarul de coloane poate fi mai mare, in functie de nr maxim de porti pe care vrea utilizatorul sa plaseze pe cate un qubit.
+
+        # Implementare cu list comprehension. Am considerat ca e nevoie ca sa folosesc si index pt pozitia din fiecare linie.
         # gates_for_each_qubit = [["" for j in range(50)] for i in range(circuit_number_of_qubits)]
-        gates_for_each_qubit = [Queue(maxsize=50) for i in range(circuit_number_of_qubits)]
+        # Dar de fapt e corecta folosirea de cozi.
+        # gates_for_each_qubit = [Queue(maxsize=50) for i in range(circuit_number_of_qubits)]
+        # Datorita incompatibilitatii cu queue.Queue din privinta dask.distributed,
+        # iar multiprocessing.Queue nu poate da copii ale elementelor sale fara sa le elimine (in acest caz
+        # am nevoie de copierea lor, nu merge nici cu copy.deepcopy()) voi folosi coada prin utilizarea tipului list.
+        gates_for_each_qubit = [[] for i in range(circuit_number_of_qubits)]
+
         x = 0
         for gate in self.circuit.data:
             #     https://quantumcomputing.stackexchange.com/questions/13667/qiskit-get-gates-from-circuit-object
@@ -207,7 +215,10 @@ class GR4_Algorithm(object):
 
             # Folosesc queue pentru a evita suprascrierea sau plasarea eronata a portilor in matrice.
             # https://www.geeksforgeeks.org/queue-in-python/
-            gates_for_each_qubit[qubit_acted_on].put(gate_name)
+            # Aceasta e pentru queue.Queue
+            # gates_for_each_qubit[qubit_acted_on].put(gate_name)
+            # Aceasta e pentru coada utilizand tipul list.
+            gates_for_each_qubit[qubit_acted_on].append(gate_name)
 
             #  ## VECHI
             # Pentru a evita suprascrierea unei valori, astfel evitand disparitia unei porti,
@@ -226,8 +237,8 @@ class GR4_Algorithm(object):
             #     x = x+1
             #  ##
 
-        # self.circuit_matrix = copy.deepcopy(gates_for_each_qubit)
-        self.circuit_matrix = list(gates_for_each_qubit)
+        self.circuit_matrix = copy.deepcopy(gates_for_each_qubit)
+        # self.circuit_matrix = list(gates_for_each_qubit)
 
 
     def print_circuit_matrix_and_figure(self, ):
@@ -240,7 +251,7 @@ class GR4_Algorithm(object):
             # for j in range(0, qubit.qsize()):
             #     gates.append(qubit.get())
             # https://stackoverflow.com/questions/54656387/printing-contents-of-a-queue-in-python
-            print("Qubit", i, list(qubit.queue))
+            print("Qubit", i, qubit)
             i = i + 1
             # print(item)
             # print()
@@ -261,7 +272,9 @@ class GR4_Algorithm(object):
 
         # https://www.geeksforgeeks.org/python-list-slicing/
         part = self.circuit_matrix[0:nr_of_qubits_per_part]
-        print(part)
+        print()
+        for qubit in part:
+            print(qubit)
 
         # Tutorial Dask Lock
         # https://www.youtube.com/watch?v=Q-Y3BR1u7c0&t=180s
@@ -270,21 +283,8 @@ class GR4_Algorithm(object):
         del self.circuit_matrix[0:nr_of_qubits_per_part] # Aici trebuie paralelizat
         lock.release()
 
-        print()
-        part_converted = []
-        # from multiprocessing import Queue
-        # qubit_queue_multiprocessing = Queue
-        for qubit in part:
-            # gates = []
-            # for j in range(0, qubit.qsize()):
-            #     gates.append(qubit.get())
-            # for gate in list(qubit.queue):
-            #     qubit_queue_multiprocessing.put(gate)
-            part_converted.append(list(qubit.queue))
-        # for item_converted in part_converted:
-        #     print(item_converted)
         # exit(0)
-        return part_converted
+        return part
         # print("Number of qubits: " + str(nr_of_qubits))
         # print("Number of qubits per part: " + str(nr_of_qubits_per_part))
         # print("Qubits: ")
@@ -350,7 +350,7 @@ class GR4_Algorithm(object):
                             gate == 't' or gate == 'sx' or \
                             gate == 's' or gate == 'barrier' or \
                             gate == 'id':
-                        print("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
+                        # print("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                         exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                     if gate == 'rx' or gate == 'ry' or\
                             gate == 'p' or gate == 'rz':
