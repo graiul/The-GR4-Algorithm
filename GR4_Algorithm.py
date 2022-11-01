@@ -349,7 +349,8 @@ class GR4_Algorithm(object):
                             gate == 'sdg' or gate == 'tdg' or \
                             gate == 't' or gate == 'sx' or \
                             gate == 's' or gate == 'barrier' or \
-                            gate == 'id':
+                            gate == 'id' or gate == 'sxdg' or \
+                            gate == 'x':
                         # print("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                         exec("new_circuit." + str(gate) + "(qreg[" + str(i) + "])")
                     if gate == 'rx' or gate == 'ry' or\
