@@ -705,92 +705,94 @@ if __name__ == '__main__':
     lc.scale(10)
     client = Client(lc)
 
-    # ## Pentru a doua posibilitate, executie cu calculatoare cuantice
-    future1 = client.submit(gr4.quantum_circuit_creator, gr4.quantum_circuit_matrix_part_getter(gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
-
-    future2 = client.submit(gr4.quantum_circuit_creator,
-                            gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
-
-    future3 = client.submit(gr4.quantum_circuit_creator,
-                            gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
-
-    future4 = client.submit(gr4.quantum_circuit_creator,
-                            gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
-
-    future5 = client.submit(gr4.quantum_circuit_creator,
-                            gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
-
-    rez1 = future1.result()
-    rez2 = future2.result()
-    rez3 = future3.result()
-    rez4 = future4.result()
-    rez5 = future5.result()
-
-    print("IBM: ")
-
-    future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
-    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
-    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez3)
-    future4 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez4)
-    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez5)
-
-    wait([future1, future2, future3, future4, future5])
-
-    # ##
-
-    # # ## Pentru a treia posibilitate, executie calculatoare cuantice combinate cu simulatoare
+    # # ## Pentru a doua posibilitate, executie cu calculatoare cuantice
     # future1 = client.submit(gr4.quantum_circuit_creator,
     #                         gr4.quantum_circuit_matrix_part_getter(
     #                             gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
-    # # wait(future1)
-    # # circuit_part_1 = future1.result()
+    #
     # future2 = client.submit(gr4.quantum_circuit_creator,
     #                         gr4.quantum_circuit_matrix_part_getter(
     #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
-    # # wait(future2)
-    # # new_circuit_1 = future2.result()
+    #
     # future3 = client.submit(gr4.quantum_circuit_creator,
     #                         gr4.quantum_circuit_matrix_part_getter(
-    #                             # gr4.obtain_quantum_backend_number_of_qubits('simulator_statevector'))
-    #                             5))
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_manila')))
     #
     # future4 = client.submit(gr4.quantum_circuit_creator,
     #                         gr4.quantum_circuit_matrix_part_getter(
-    #                             # gr4.obtain_quantum_backend_number_of_qubits('simulator_mps')))
-    #                             4))
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
+    #
     # future5 = client.submit(gr4.quantum_circuit_creator,
     #                         gr4.quantum_circuit_matrix_part_getter(
-    #                             # gr4.obtain_quantum_backend_number_of_qubits('ibmq_qasm_simulator')))
-    #                             4))
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+    #
     # rez1 = future1.result()
     # rez2 = future2.result()
     # rez3 = future3.result()
     # rez4 = future4.result()
     # rez5 = future5.result()
     #
-    # # print(rez1.draw(fold=-1))
-    # # print(rez2.draw(fold=-1))
-    # # print(rez3.draw(fold=-1))
-    # # print(rez4.draw(fold=-1))
-    # # print(rez5.draw(fold=-1))
-    #
-    #
     # print("IBM: ")
-    # # backend1 = provider.get_backend('ibmq_belem')
-    # # backend2 = provider.get_backend('ibmq_lima')
-    # # backend3 = provider.get_backend('ibmq_quito')
+    #
     # future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
-    # # wait(future1)
     # future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
-    # future3 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez3)
-    # future4 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez4)
-    # future5 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez5)
+    # future3 = client.submit(gr4.send_to_kingdom, 'ibmq_manila', rez3)
+    # future4 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez4)
+    # future5 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez5)
     #
     # wait([future1, future2, future3, future4, future5])
+    #
+    # # ##
+
+    # ## Pentru a treia posibilitate, executie calculatoare cuantice combinate cu simulatoare
+    future1 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                gr4.obtain_quantum_backend_number_of_qubits('ibm_oslo')))
+    # wait(future1)
+    # circuit_part_1 = future1.result()
+    future2 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+    # wait(future2)
+    # new_circuit_1 = future2.result()
+    future3 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_statevector'))
+                                5))
+
+    future4 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('simulator_mps')))
+                                4))
+    future5 = client.submit(gr4.quantum_circuit_creator,
+                            gr4.quantum_circuit_matrix_part_getter(
+                                # gr4.obtain_quantum_backend_number_of_qubits('ibmq_qasm_simulator')))
+                                4))
+    rez1 = future1.result()
+    rez2 = future2.result()
+    rez3 = future3.result()
+    rez4 = future4.result()
+    rez5 = future5.result()
+
+    # print(rez1.draw(fold=-1))
+    # print(rez2.draw(fold=-1))
+    # print(rez3.draw(fold=-1))
+    # print(rez4.draw(fold=-1))
+    # print(rez5.draw(fold=-1))
+
+
+    print("IBM: ")
+    # backend1 = provider.get_backend('ibmq_belem')
+    # backend2 = provider.get_backend('ibmq_lima')
+    # backend3 = provider.get_backend('ibmq_quito')
+    future1 = client.submit(gr4.send_to_kingdom, 'ibm_oslo', rez1)
+    # wait(future1)
+    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez2)
+    future3 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez3)
+    future4 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez4)
+    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez5)
+
+    wait([future1, future2, future3, future4, future5])
     #
     # # In cazul simulatoarelor trebuie avut in vedere ca ele au mai mult de 5 qubiti.
     # # In cazul unui circuit cu 25 de qubiti si urmatoarele echipamente:
