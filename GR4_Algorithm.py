@@ -710,26 +710,26 @@ if __name__ == '__main__':
     lc.scale(10)
     client = Client(lc)
 
-    # ## Pentru a doua posibilitate, executie cu calculatoare cuantice
+    #  ## Pentru prima posibilitate, executie doar cu simulatoare.
     future1 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
+                                5))
 
     future2 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
+                                5))
 
     future3 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_lima')))
+                                5))
 
     future4 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+                                5))
 
     future5 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                gr4.obtain_quantum_backend_number_of_qubits('ibmq_manila')))
+                                5))
 
     rez1 = future1.result()
     rez2 = future2.result()
@@ -739,13 +739,51 @@ if __name__ == '__main__':
 
     print("IBM: ")
 
-    future1 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez1)
-    future2 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez2)
-    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_lima', rez3)
-    future4 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez4)
-    future5 = client.submit(gr4.send_to_kingdom, 'ibmq_manila', rez5)
+    future1 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez1)
+    future2 = client.submit(gr4.send_to_kingdom, 'simulator_statevector', rez2)
+    future3 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez3)
+    future4 = client.submit(gr4.send_to_kingdom, 'ibmq_qasm_simulator', rez4)
+    future5 = client.submit(gr4.send_to_kingdom, 'simulator_mps', rez5)
 
     wait([future1, future2, future3, future4, future5])
+    #  ##
+
+    # ## Pentru a doua posibilitate, executie cu calculatoare cuantice
+    # future1 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
+    #
+    # future2 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_belem')))
+    #
+    # future3 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_lima')))
+    #
+    # future4 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_quito')))
+    #
+    # future5 = client.submit(gr4.quantum_circuit_creator,
+    #                         gr4.quantum_circuit_matrix_part_getter(
+    #                             gr4.obtain_quantum_backend_number_of_qubits('ibmq_manila')))
+    #
+    # rez1 = future1.result()
+    # rez2 = future2.result()
+    # rez3 = future3.result()
+    # rez4 = future4.result()
+    # rez5 = future5.result()
+    #
+    # print("IBM: ")
+    #
+    # future1 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez1)
+    # future2 = client.submit(gr4.send_to_kingdom, 'ibmq_belem', rez2)
+    # future3 = client.submit(gr4.send_to_kingdom, 'ibmq_lima', rez3)
+    # future4 = client.submit(gr4.send_to_kingdom, 'ibmq_quito', rez4)
+    # future5 = client.submit(gr4.send_to_kingdom, 'ibmq_manila', rez5)
+    #
+    # wait([future1, future2, future3, future4, future5])
 
     # ##
 
