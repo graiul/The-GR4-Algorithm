@@ -713,23 +713,23 @@ if __name__ == '__main__':
     #  ## Pentru prima posibilitate, executie doar cu simulatoare.
     future1 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                5))
+                                6))
 
     future2 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                5))
+                                3))
 
     future3 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                5))
+                                9))
 
     future4 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                5))
+                                6))
 
     future5 = client.submit(gr4.quantum_circuit_creator,
                             gr4.quantum_circuit_matrix_part_getter(
-                                5))
+                                1))
 
     rez1 = future1.result()
     rez2 = future2.result()
